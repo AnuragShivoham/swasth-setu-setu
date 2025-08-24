@@ -116,11 +116,11 @@ const Pet = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => alert('Starting vet consultation...')}>
               <Video className="h-5 w-5 mr-2" />
               Start Vet Consultation
             </Button>
-            <Button variant="medical" size="lg">
+            <Button variant="medical" size="lg" onClick={() => alert('Pet checkup scheduling coming soon!')}>
               <Calendar className="h-5 w-5 mr-2" />
               Schedule Pet Checkup
             </Button>
@@ -160,7 +160,7 @@ const Pet = () => {
               eta="5 min"
               queuePosition={2}
               totalQueue={8}
-              onConsult={() => console.log("Starting pet video consultation")}
+              onConsult={() => alert("Starting pet video consultation...")}
             />
             <ConsultCard
               type="audio"
@@ -168,16 +168,16 @@ const Pet = () => {
               description="Discuss pet symptoms and behavior with veterinary experts"
               doctorName="Anita Verma"
               specialty="General Veterinary"
-              onConsult={() => console.log("Starting pet audio consultation")}
-              onCancel={() => console.log("Cancelling pet consultation")}
-              onReschedule={() => console.log("Rescheduling pet consultation")}
+              onConsult={() => alert("Starting pet audio consultation...")}
+              onCancel={() => alert("Pet consultation cancelled")}
+              onReschedule={() => alert("Rescheduling pet consultation...")}
             />
             <ConsultCard
               type="async"
               title="Pet Care Messages"
               description="Send photos and details about your pet's condition for expert advice"
               eta="30 min"
-              onConsult={() => console.log("Starting pet async consultation")}
+              onConsult={() => alert("Starting pet message consultation...")}
             />
           </div>
         </section>
@@ -295,7 +295,7 @@ const Pet = () => {
         {/* Pet Care Features */}
         <section>
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Why Choose SwasthSetu for Pet Healthcare?</h3>
+            <h3 className="text-2xl font-bold mb-4">Why Choose Medi & Tail for Pet Healthcare?</h3>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -350,11 +350,11 @@ const Pet = () => {
             For urgent pet health situations, connect with emergency veterinarians immediately
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="emergency" size="lg">
+            <Button variant="destructive" size="lg" onClick={() => window.open('tel:102')}>
               <Phone className="h-5 w-5 mr-2" />
               Emergency Vet Call
             </Button>
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => alert('Quick vet chat starting...')}>
               <MessageSquare className="h-5 w-5 mr-2" />
               Quick Vet Chat
             </Button>
