@@ -249,7 +249,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_medical_history: {
+        Args: { user_id_param: string }
+        Returns: {
+          diagnosis: string
+          doctor_name: string
+          medical_images: string[]
+          prescription_notes: string
+          record_date: string
+          record_id: string
+          specialization: string
+          symptoms: string
+          treatment_plan: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
