@@ -98,17 +98,17 @@ const Index = () => {
                   </span>
                 </h1>
                 <p className="text-xl trust-text max-w-lg">
-                  SwasthSetu bridges patients, doctors, and public health systems with 
+                  Medi & Tail bridges patients, doctors, and public health systems with 
                   flexible scheduling, multilingual support, and reliable connectivity 
                   that works everywhere in India.
                 </p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="text-lg px-8">
+                <Button variant="hero" size="lg" className="text-lg px-8" onClick={() => window.location.href = '/human'}>
                   Start Consultation Now
                 </Button>
-                <Button variant="medical" size="lg" className="text-lg px-8">
+                <Button variant="medical" size="lg" className="text-lg px-8" onClick={() => window.location.href = '/human'}>
                   Book Appointment
                 </Button>
               </div>
@@ -187,7 +187,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              Why SwasthSetu is Different
+              Why Medi & Tail is Different
             </h2>
             <p className="text-xl trust-text max-w-3xl mx-auto">
               We've reimagined telemedicine to address real challenges faced by 
@@ -222,7 +222,7 @@ const Index = () => {
           </div>
           
           <div className="text-center">
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => window.location.href = '/human'}>
               View All Doctors
             </Button>
           </div>
@@ -263,7 +263,7 @@ const Index = () => {
               </div>
               
               <div className="pt-4">
-                <Button variant="medical" size="lg">
+                <Button variant="medical" size="lg" onClick={() => alert('Technology information coming soon!')}>
                   Learn More About Our Technology
                 </Button>
               </div>
@@ -287,15 +287,15 @@ const Index = () => {
               Ready to Experience Better Healthcare?
             </h2>
             <p className="text-xl opacity-90">
-              Join millions of Indians who trust SwasthSetu for their healthcare needs. 
+              Join millions of Indians who trust Medi & Tail for their healthcare needs. 
               Get started today and experience the future of telemedicine.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button variant="secondary" size="lg" className="text-lg px-8">
+              <Button variant="secondary" size="lg" className="text-lg px-8" onClick={() => alert('Mobile app coming soon!')}>
                 <Download className="mr-2 h-5 w-5" />
                 Download Mobile App
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 text-white border-white hover:bg-white hover:text-primary">
+              <Button variant="outline" size="lg" className="text-lg px-8 text-white border-white hover:bg-white hover:text-primary" onClick={() => window.location.href = '/human'}>
                 Book Your First Consultation
               </Button>
             </div>
@@ -308,7 +308,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
-              <h3 className="text-2xl font-bold">SwasthSetu</h3>
+              <h3 className="text-2xl font-bold">Medi & Tail</h3>
               <p className="text-background/70">
                 Bridging healthcare gaps across India with modern telemedicine 
                 that works for everyone.
@@ -348,7 +348,7 @@ const Index = () => {
           
           <div className="border-t border-background/20 mt-12 pt-8 text-center">
             <p className="text-background/70">
-              © 2024 SwasthSetu. Making healthcare accessible for every Indian.
+              © 2024 Medi & Tail. Making healthcare accessible for every Indian.
             </p>
           </div>
         </div>
