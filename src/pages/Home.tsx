@@ -19,7 +19,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Stethoscope className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold">Medi & Tail</h1>
+              <h1 className="text-2xl font-bold">SwasthSetu</h1>
             </div>
             <Button variant="outline" onClick={() => setActiveTab("settings")}>
               <Settings className="h-4 w-4 mr-2" />
@@ -53,7 +53,7 @@ const Home = () => {
                 Choose Your Healthcare Service
               </h2>
               <p className="text-xl trust-text max-w-2xl mx-auto">
-                Medi & Tail provides comprehensive healthcare for both humans and pets. 
+                SwasthSetu provides comprehensive healthcare for both humans and pets. 
                 Click on the image below to get started.
               </p>
             </div>
@@ -175,7 +175,7 @@ const Home = () => {
                 <MessageCircle className="h-5 w-5 mr-2" />
                 Quick Consultation
               </Button>
-              <Button variant="outline" size="lg" onClick={() => window.open('tel:102')}>
+              <Button variant="outline" size="lg">
                 <Phone className="h-5 w-5 mr-2" />
                 Emergency: 102
               </Button>
@@ -191,7 +191,7 @@ const Home = () => {
               <CardHeader>
                 <CardTitle>Settings</CardTitle>
                 <CardDescription>
-                  Manage your Medi & Tail preferences and account settings
+                  Manage your SwasthSetu preferences and account settings
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -203,21 +203,21 @@ const Home = () => {
                         <div className="font-medium">Language</div>
                         <div className="text-sm text-muted-foreground">Choose your preferred language</div>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => alert('Language selection coming soon!')}>Hindi</Button>
+                      <Button variant="outline" size="sm">Hindi</Button>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <div className="font-medium">Notifications</div>
                         <div className="text-sm text-muted-foreground">Consultation reminders and updates</div>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => alert('Notification settings updated!')}>Enabled</Button>
+                      <Button variant="outline" size="sm">Enabled</Button>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <div className="font-medium">Emergency Contacts</div>
                         <div className="text-sm text-muted-foreground">Manage your emergency contacts</div>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => alert('Emergency contacts management coming soon!')}>Manage</Button>
+                      <Button variant="outline" size="sm">Manage</Button>
                     </div>
                   </div>
                 </div>
@@ -230,25 +230,20 @@ const Home = () => {
                         <div className="font-medium">ABDM Integration</div>
                         <div className="text-sm text-muted-foreground">Connect with Ayushman Bharat Digital Mission</div>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => alert('ABDM integration coming soon!')}>Connect</Button>
+                      <Button variant="outline" size="sm">Connect</Button>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <div className="font-medium">Data Sharing</div>
                         <div className="text-sm text-muted-foreground">Control how your health data is shared</div>
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => alert('Data sharing preferences updated!')}>Manage</Button>
+                      <Button variant="outline" size="sm">Manage</Button>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t">
-                  <Button variant="destructive" size="sm" onClick={() => {
-                    if (confirm('Are you sure you want to sign out?')) {
-                      alert('Signed out successfully!');
-                      navigate('/landing');
-                    }
-                  }}>
+                  <Button variant="destructive" size="sm">
                     Sign Out
                   </Button>
                 </div>
