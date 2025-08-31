@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,45 +13,50 @@ interface Message {
   timestamp: Date;
 }
 
-const DoctorChatbot = () => {
+type DoctorChatbotProps = { initialMessage?: string };
+
+const DoctorChatbot = ({ initialMessage }: DoctorChatbotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      content: "Hello! I'm your AI health assistant. I can help you with basic health queries, symptom assessment, and guide you to the right healthcare services. How can I help you today?",
+      content:
+        "Hello! I'm your AI health assistant. I can help you with basic health queries, symptom assessment, and guide you to the right healthcare services. How can I help you today?",
       sender: "bot",
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const sendMessage = async (text: string) => {
+    if (!text.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: text,
       sender: "user",
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate bot response
     setTimeout(() => {
-      const botResponse = generateBotResponse(inputMessage);
+      const botResponse = generateBotResponse(text);
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: botResponse,
         sender: "bot",
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
       setIsTyping(false);
     }, 1000 + Math.random() * 2000);
   };
+
+  const handleSendMessage = () => sendMessage(inputMessage);
+
 
   const generateBotResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
@@ -166,7 +171,7 @@ const DoctorChatbot = () => {
             placeholder="Ask about symptoms, health concerns, or book appointments..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             className="flex-1"
           />
           <Button 

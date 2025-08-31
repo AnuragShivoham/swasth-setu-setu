@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
@@ -17,9 +18,21 @@ import {
   Cat,
   Rabbit
 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 const Pet = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [showSpecialists, setShowSpecialists] = useState(false);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+
 
   const petServices = [
     { name: "General Veterinary", vets: 200, available: 15, icon: Heart },
@@ -116,11 +129,11 @@ const Pet = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
               <Video className="h-5 w-5 mr-2" />
               Start Vet Consultation
             </Button>
-            <Button variant="medical" size="lg">
+            <Button variant="medical" size="lg" onClick={() => setShowSchedule(true)}>
               <Calendar className="h-5 w-5 mr-2" />
               Schedule Pet Checkup
             </Button>
@@ -177,7 +190,7 @@ const Pet = () => {
               title="Pet Care Messages"
               description="Send photos and details about your pet's condition for expert advice"
               eta="30 min"
-              onConsult={() => console.log("Starting pet async consultation")}
+              onConsult={() => navigate('/?tab=chatbot&context=pet')}
             />
           </div>
         </section>
@@ -206,7 +219,15 @@ const Pet = () => {
                   <p className="text-sm text-muted-foreground">
                     {service.vets} veterinarians available
                   </p>
-                  <Button variant="outline" size="sm" className="w-full mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-3"
+                    onClick={() => {
+                      setSelectedService(service.name);
+                      setShowSpecialists(true);
+                    }}
+                  >
                     View Specialists
                   </Button>
                 </CardContent>
@@ -285,7 +306,7 @@ const Pet = () => {
           </div>
           
           <div className="text-center">
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => setShowSpecialists(true)}>
               <Users className="h-5 w-5 mr-2" />
               View All 500+ Veterinarians
             </Button>
@@ -350,16 +371,74 @@ const Pet = () => {
             For urgent pet health situations, connect with emergency veterinarians immediately
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="emergency" size="lg">
+            <Button variant="emergency" size="lg" onClick={() => (window.location.href = 'tel:102')}>
               <Phone className="h-5 w-5 mr-2" />
               Emergency Vet Call
             </Button>
-            <Button variant="consult" size="lg">
+            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
               <MessageSquare className="h-5 w-5 mr-2" />
               Quick Vet Chat
             </Button>
           </div>
         </section>
+
+        {/* Schedule Dialog */}
+        <Dialog open={showSchedule} onOpenChange={setShowSchedule}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Schedule Pet Checkup</DialogTitle>
+              <DialogDescription>Select a convenient date and time.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="date" className="text-right">Date</Label>
+                <Input id="date" type="date" className="col-span-3" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="time" className="text-right">Time</Label>
+                <Input id="time" type="time" className="col-span-3" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowSchedule(false)}>Cancel</Button>
+              <Button
+                onClick={() => {
+                  if (!scheduleDate || !scheduleTime) return;
+                  const appts = JSON.parse(localStorage.getItem('appointments') || '[]');
+                  appts.push({ kind: 'pet', date: scheduleDate, time: scheduleTime, createdAt: new Date().toISOString() });
+                  localStorage.setItem('appointments', JSON.stringify(appts));
+                  toast({ title: 'Appointment scheduled', description: `${scheduleDate} at ${scheduleTime}` });
+                  setShowSchedule(false);
+                }}
+              >
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Specialists Dialog */}
+        <Dialog open={showSpecialists} onOpenChange={setShowSpecialists}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{selectedService ? `${selectedService} Specialists` : 'All Veterinarians'}</DialogTitle>
+              <DialogDescription>Select a vet to start chat.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3">
+              {availableVets
+                .filter(v => !selectedService || v.specialty === selectedService)
+                .map((vet, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div>
+                      <div className="font-medium">Dr. {vet.name}</div>
+                      <div className="text-sm text-muted-foreground">{vet.specialty} • {vet.availability}</div>
+                    </div>
+                    <Button size="sm" onClick={() => navigate('/?tab=chatbot&context=pet')}>Start Chat</Button>
+                  </div>
+                ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

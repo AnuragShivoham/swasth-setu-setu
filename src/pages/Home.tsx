@@ -2,14 +2,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
-import { User, Heart, MessageCircle, Settings, Stethoscope, Phone } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { User, Heart, MessageCircle, Settings, Stethoscope, Phone, Image as ImageIcon } from "lucide-react";
 import manWithDogImage from "@/assets/man-with-dog.jpg";
 import DoctorChatbot from "@/components/DoctorChatbot";
-
+import PhotoDiagnosis from "@/components/PhotoDiagnosis";
 const Home = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("services");
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const initialTab = params.get("tab") || "services";
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const context = params.get("context");
+  const chatInitial = context === "pet" ? "My pet needs help" : context === "human" ? "I need a doctor consultation" : undefined;
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +36,7 @@ const Home = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Services
@@ -39,6 +44,10 @@ const Home = () => {
             <TabsTrigger value="chatbot" className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
               Doctor Chat
+            </TabsTrigger>
+            <TabsTrigger value="photo" className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4" />
+              Photo Diagnosis
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -183,7 +192,10 @@ const Home = () => {
           </TabsContent>
 
           <TabsContent value="chatbot">
-            <DoctorChatbot />
+            <DoctorChatbot initialMessage={chatInitial ?? undefined} />
+          </TabsContent>
+          <TabsContent value="photo">
+            <PhotoDiagnosis />
           </TabsContent>
 
           <TabsContent value="settings">
