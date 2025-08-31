@@ -105,11 +105,11 @@ const Human = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" onClick={() => alert('Starting video consultation...')}>
+            <Button variant="hero" size="lg">
               <Video className="h-5 w-5 mr-2" />
               Start Video Consultation
             </Button>
-            <Button variant="medical" size="lg" onClick={() => alert('Appointment scheduling coming soon!')}>
+            <Button variant="medical" size="lg">
               <Calendar className="h-5 w-5 mr-2" />
               Schedule Appointment
             </Button>
@@ -129,7 +129,7 @@ const Human = () => {
               eta="2 min"
               queuePosition={3}
               totalQueue={12}
-              onConsult={() => alert("Starting video consultation...")}
+              onConsult={() => console.log("Starting video consultation")}
             />
             <ConsultCard
               type="audio"
@@ -137,16 +137,16 @@ const Human = () => {
               description="Voice-only consultation optimized for low bandwidth areas"
               doctorName="Priya Sharma"
               specialty="General Medicine"
-              onConsult={() => alert("Starting audio consultation...")}
-              onCancel={() => alert("Consultation cancelled")}
-              onReschedule={() => alert("Rescheduling consultation...")}
+              onConsult={() => console.log("Starting audio consultation")}
+              onCancel={() => console.log("Cancelling consultation")}
+              onReschedule={() => console.log("Rescheduling consultation")}
             />
             <ConsultCard
               type="async"
               title="Message Doctor"
               description="Share symptoms and get expert medical advice through secure messaging"
               eta="1 hour"
-              onConsult={() => alert("Starting message consultation...")}
+              onConsult={() => console.log("Starting async consultation")}
             />
           </div>
         </section>
@@ -205,7 +205,7 @@ const Human = () => {
         {/* Features */}
         <section>
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Why Choose Medi & Tail for Human Healthcare?</h3>
+            <h3 className="text-2xl font-bold mb-4">Why Choose SwasthSetu for Human Healthcare?</h3>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -260,11 +260,11 @@ const Human = () => {
             For life-threatening situations, call emergency services immediately
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" onClick={() => window.open('tel:108')}>
+            <Button variant="secondary" size="lg">
               <Phone className="h-5 w-5 mr-2" />
               Call 108 (Emergency)
             </Button>
-            <Button variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-destructive" onClick={() => window.open('tel:102')}>
+            <Button variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-destructive">
               <Phone className="h-5 w-5 mr-2" />
               Call 102 (Medical)
             </Button>
