@@ -3,12 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
 import DoctorCard from "@/components/DoctorCard";
 import FeatureCard from "@/components/FeatureCard";
-import { 
-  Shield, 
-  Clock, 
-  Globe, 
-  Heart, 
-  Users, 
+import { Link } from "react-router-dom";
+import {
+  Shield,
+  Clock,
+  Globe,
+  Heart,
+  Users,
   Download,
   Star,
   CheckCircle,
@@ -105,12 +106,16 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="text-lg px-8">
-                  Start Consultation Now
-                </Button>
-                <Button variant="medical" size="lg" className="text-lg px-8">
-                  Book Appointment
-                </Button>
+                <Link to="/human">
+                  <Button variant="hero" size="lg" className="text-lg px-8">
+                    Access Human Healthcare
+                  </Button>
+                </Link>
+                <Link to="/pet">
+                  <Button variant="medical" size="lg" className="text-lg px-8">
+                    Access Pet Healthcare
+                  </Button>
+                </Link>
               </div>
 
               <div className="flex items-center gap-8 pt-4">

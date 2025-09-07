@@ -1,3 +1,5 @@
+import React from "react";
+import { Link } from "react-router-dom";
 import manWithPet from "../assets/man-with-pet.jpg"; // ✅ forward slash, not backslash
 
 function Home() {
@@ -75,9 +77,9 @@ function Home() {
             <li>5000+ verified doctors</li>
             <li>Emergency support 24/7</li>
           </ul>
-          <button className="mt-5 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <Link to="/human" className="mt-5 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
             Access Human Healthcare
-          </button>
+          </Link>
         </div>
 
         {/* Pet Healthcare */}
@@ -97,9 +99,9 @@ function Home() {
             <li>Emergency pet care</li>
             <li>Nutrition guidance</li>
           </ul>
-          <button className="mt-5 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+          <Link to="/pet" className="mt-5 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
             Access Pet Healthcare
-          </button>
+          </Link>
         </div>
       </div>
 

@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SwasthSetu</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../swasth-setu-setu/src/App.css" />
 </head>
 <body class="bg-gray-50 font-sans">
   <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="../swasth-setu-setu/src/main.tsx"></script>
   <!-- Navbar -->
   <nav class="flex items-center justify-between px-6 py-4 bg-white shadow">
     <div class="flex items-center space-x-2">
-      <img src="doctor_logo.webp" class="h-6 w-6" alt="logo" />
+      <img src="../swasth-setu-setu/public/images/logo.png" class="h-6 w-6" alt="logo" />
       <span class="text-xl font-semibold text-gray-700">PAWMANITY</span>
     </div>
     <div>
@@ -39,7 +40,7 @@
 
   <!-- Main Image -->
   <div class="flex justify-center mt-8">
-<img src="/images/man-with-dog.jpg" 
+<img src="../swasth-setu-setu/public/images/man-with-dog.jpg" 
      alt="doctor with pet" 
      class="rounded-xl shadow-lg max-w-3xl" />
   </div>
@@ -49,8 +50,9 @@
     <!-- Human Healthcare -->
     <div class="bg-white rounded-xl shadow p-6">
       <h2 class="flex items-center text-lg font-semibold text-gray-800">
-        <img src="https://img.icons8.com/ios-filled/24/4a90e2/user.png" class="mr-2"/> 
-        Human Healthcare
+        <img src="../swasth-setu-setu/public/images/Human.png" class="mr-2"/>
+
+        <h1><b>... <hr>Human Healthcare</b></h1>
       </h2>
       <p class="text-gray-500 text-sm">Complete medical care for people</p>
       <ul class="mt-4 text-gray-600 text-sm space-y-1 list-disc list-inside">
@@ -60,14 +62,15 @@
         <li>Emergency support 24/7</li>
       </ul>
       <button class="mt-5 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-        Access Human Healthcare
+       <a href="../doctors/human.html">Access Human Healthcare</a>
       </button>
     </div>
     <!-- Pet Healthcare -->
     <div class="bg-white rounded-xl shadow p-6">
       <h2 class="flex items-center text-lg font-semibold text-gray-800">
-        <img src="https://img.icons8.com/ios-filled/24/4a90e2/dog.png" class="mr-2"/> 
-        Pet Healthcare
+        <img src="../swasth-setu-setu/public/images/pet_logo.webp" class="mr-2"/> 
+        
+         <h1>_<hr><b>... <hr>pet Healthcare</b></h1>
       </h2>
       <p class="text-gray-500 text-sm">Veterinary care for your beloved pets</p>
       <ul class="mt-4 text-gray-600 text-sm space-y-1 list-disc list-inside">
@@ -77,7 +80,7 @@
         <li>Nutrition guidance</li>
       </ul>
       <button class="mt-5 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-        Access Pet Healthcare
+        <a href="../pets/pet.html">Access Pet Healthcare</a>
       </button>
     </div>
   </div>
