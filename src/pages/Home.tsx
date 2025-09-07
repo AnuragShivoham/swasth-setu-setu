@@ -1,119 +1,271 @@
-import manWithPet from "../assets/man-with-pet.jpg"; // ✅ forward slash, not backslash
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate, useLocation } from "react-router-dom";
+import { User, Heart, MessageCircle, Settings, Stethoscope, Phone, Image as ImageIcon } from "lucide-react";
+import manWithDogImage from "@/assets/man-with-dog.jpg";
+import DoctorChatbot from "@/components/DoctorChatbot";
+import PhotoDiagnosis from "@/components/PhotoDiagnosis";
+const Home = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const initialTab = params.get("tab") || "services";
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const context = params.get("context");
+  const chatInitial = context === "pet" ? "My pet needs help" : context === "human" ? "I need a doctor consultation" : undefined;
 
-function Home() {
   return (
-    <div className="bg-gray-50 font-sans min-h-screen">
-      {/* Navbar */}
-      <nav className="flex items-center justify-between px-6 py-4 bg-white shadow">
-        <div className="flex items-center space-x-2">
-          <img
-            src="https://img.icons8.com/ios-filled/50/4a90e2/medical-doctor.png"
-            className="h-6 w-6"
-            alt="logo"
-          />
-          <span className="text-xl font-semibold text-gray-700">SwasthSetu</span>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card/50 backdrop-blur">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Stethoscope className="h-8 w-8 text-primary" />
+              <h1 className="text-2xl font-bold">SwasthSetu</h1>
+            </div>
+            <Button variant="outline" onClick={() => setActiveTab("settings")}>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+          </div>
         </div>
-        <div>
-          <button className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">
-            Settings
-          </button>
-        </div>
-      </nav>
+      </header>
 
-      {/* Tabs */}
-      <div className="flex justify-center space-x-6 mt-6">
-        <button className="px-4 py-2 border-b-2 border-blue-500 text-blue-600 font-medium">
-          Services
-        </button>
-        <button className="px-4 py-2 text-gray-600 hover:text-blue-600">
-          Doctor Chat
-        </button>
-        <button className="px-4 py-2 text-gray-600 hover:text-blue-600">
-          Photo Diagnosis
-        </button>
-        <button className="px-4 py-2 text-gray-600 hover:text-blue-600">
-          Settings
-        </button>
-      </div>
+      <div className="container mx-auto px-4 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
+            <TabsTrigger value="services" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              Services
+            </TabsTrigger>
+            <TabsTrigger value="chatbot" className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              Doctor Chat
+            </TabsTrigger>
+            <TabsTrigger value="photo" className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4" />
+              Photo Diagnosis
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Heading */}
-      <div className="text-center mt-10">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Choose Your Healthcare Service
-        </h1>
-        <p className="text-gray-600 mt-2">
-          SwasthSetu provides comprehensive healthcare for both humans and pets.
-          Click on the image below to get started.
-        </p>
-      </div>
+          <TabsContent value="services" className="space-y-8">
+            {/* Hero Section */}
+            <div className="text-center space-y-6">
+              <h2 className="text-4xl font-bold">
+                Choose Your Healthcare Service
+              </h2>
+              <p className="text-xl trust-text max-w-2xl mx-auto">
+                SwasthSetu provides comprehensive healthcare for both humans and pets. 
+                Click on the image below to get started.
+              </p>
+            </div>
 
-      {/* Main Image (✅ local import use kar raha hai) */}
-      <div className="flex justify-center mt-8">
-        <img
-          src={manWithPet}
-          alt="doctor with pet"
-          className="rounded-xl shadow-lg max-w-3xl"
-        />
-      </div>
+            {/* Interactive Image */}
+            <div className="relative max-w-4xl mx-auto">
+              <img 
+                src={manWithDogImage} 
+                alt="Man holding a dog - click for healthcare services"
+                className="w-full h-auto rounded-2xl shadow-[var(--shadow-consultation)]"
+              />
+              
+              {/* Clickable Overlays */}
+              <div className="absolute inset-0 flex">
+                {/* Human Healthcare Area - Left Side */}
+                <button
+                  onClick={() => navigate('/human')}
+                  className="flex-1 group relative overflow-hidden rounded-l-2xl hover:bg-primary/10 transition-all duration-300"
+                  aria-label="Human Healthcare Services"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg">
+                      <div className="flex items-center gap-2 text-primary font-semibold">
+                        <User className="h-5 w-5" />
+                        Human Healthcare
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Telemedicine for people
+                      </p>
+                    </div>
+                  </div>
+                </button>
 
-      {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
-        {/* Human Healthcare */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="flex items-center text-lg font-semibold text-gray-800">
-            <img
-              src="https://img.icons8.com/ios-filled/24/4a90e2/user.png"
-              className="mr-2"
-              alt="user"
-            />
-            Human Healthcare
-          </h2>
-          <p className="text-gray-500 text-sm">Complete medical care for people</p>
-          <ul className="mt-4 text-gray-600 text-sm space-y-1 list-disc list-inside">
-            <li>Video/Audio consultations</li>
-            <li>12+ Indian languages</li>
-            <li>5000+ verified doctors</li>
-            <li>Emergency support 24/7</li>
-          </ul>
-          <button className="mt-5 w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Access Human Healthcare
-          </button>
-        </div>
+                {/* Pet Healthcare Area - Right Side */}
+                <button
+                  onClick={() => navigate('/pet')}
+                  className="flex-1 group relative overflow-hidden rounded-r-2xl hover:bg-secondary/10 transition-all duration-300"
+                  aria-label="Pet Healthcare Services"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-l from-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg">
+                      <div className="flex items-center gap-2 text-secondary font-semibold">
+                        <Heart className="h-5 w-5" />
+                        Pet Healthcare
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Veterinary telemedicine
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
 
-        {/* Pet Healthcare */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="flex items-center text-lg font-semibold text-gray-800">
-            <img
-              src="https://img.icons8.com/ios-filled/24/4a90e2/dog.png"
-              className="mr-2"
-              alt="dog"
-            />
-            Pet Healthcare
-          </h2>
-          <p className="text-gray-500 text-sm">Veterinary care for your beloved pets</p>
-          <ul className="mt-4 text-gray-600 text-sm space-y-1 list-disc list-inside">
-            <li>Expert veterinarians</li>
-            <li>Behavioral consultations</li>
-            <li>Emergency pet care</li>
-            <li>Nutrition guidance</li>
-          </ul>
-          <button className="mt-5 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-            Access Pet Healthcare
-          </button>
-        </div>
-      </div>
+            {/* Service Cards */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <Card 
+                className="consultation-card hover-scale cursor-pointer"
+                onClick={() => navigate('/human')}
+              >
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Human Healthcare</CardTitle>
+                      <CardDescription>Complete medical care for people</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Video/Audio consultations</li>
+                    <li>• 12+ Indian languages</li>
+                    <li>• 5000+ verified doctors</li>
+                    <li>• Emergency support 24/7</li>
+                  </ul>
+                  <Button variant="hero" className="w-full mt-4">
+                    Access Human Healthcare
+                  </Button>
+                </CardContent>
+              </Card>
 
-      {/* Footer Buttons */}
-      <div className="flex justify-center gap-6 mt-10 mb-8">
-        <button className="px-6 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
-          Quick Consultation
-        </button>
-        <button className="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
-          Emergency: 102
-        </button>
+              <Card 
+                className="consultation-card hover-scale cursor-pointer"
+                onClick={() => navigate('/pet')}
+              >
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg bg-secondary/10">
+                      <Heart className="h-6 w-6 text-secondary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Pet Healthcare</CardTitle>
+                      <CardDescription>Veterinary care for your beloved pets</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Expert veterinarians</li>
+                    <li>• Behavioral consultations</li>
+                    <li>• Emergency pet care</li>
+                    <li>• Nutrition guidance</li>
+                  </ul>
+                  <Button variant="consult" className="w-full mt-4">
+                    Access Pet Healthcare
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+              <Button variant="medical" size="lg" onClick={() => setActiveTab("chatbot")}>
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Quick Consultation
+              </Button>
+              <Button variant="outline" size="lg">
+                <Phone className="h-5 w-5 mr-2" />
+                Emergency: 102
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="chatbot">
+            <DoctorChatbot initialMessage={chatInitial ?? undefined} />
+          </TabsContent>
+          <TabsContent value="photo">
+            <PhotoDiagnosis />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card className="max-w-2xl mx-auto">
+              <CardHeader>
+                <CardTitle>Settings</CardTitle>
+                <CardDescription>
+                  Manage your SwasthSetu preferences and account settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="font-medium">Account Preferences</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">Language</div>
+                        <div className="text-sm text-muted-foreground">Choose your preferred language</div>
+                      </div>
+                      <Button variant="outline" size="sm">Hindi</Button>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">Notifications</div>
+                        <div className="text-sm text-muted-foreground">Consultation reminders and updates</div>
+                      </div>
+                      <Button variant="outline" size="sm">Enabled</Button>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">Emergency Contacts</div>
+                        <div className="text-sm text-muted-foreground">Manage your emergency contacts</div>
+                      </div>
+                      <Button variant="outline" size="sm">Manage</Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-medium">Privacy & Security</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">ABDM Integration</div>
+                        <div className="text-sm text-muted-foreground">Connect with Ayushman Bharat Digital Mission</div>
+                      </div>
+                      <Button variant="outline" size="sm">Connect</Button>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">Data Sharing</div>
+                        <div className="text-sm text-muted-foreground">Control how your health data is shared</div>
+                      </div>
+                      <Button variant="outline" size="sm">Manage</Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <Button variant="destructive" size="sm">
+                    Sign Out
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-}
+};
 
 export default Home;
