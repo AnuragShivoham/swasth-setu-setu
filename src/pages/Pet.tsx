@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
+import VideoCall from "@/components/VideoCall";
 import { useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
@@ -32,6 +33,8 @@ const Pet = () => {
   const [scheduleTime, setScheduleTime] = useState("");
   const [showSpecialists, setShowSpecialists] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [selectedVet, setSelectedVet] = useState<{ name: string; specialty: string } | null>(null);
 
 
   const petServices = [
@@ -129,7 +132,10 @@ const Pet = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
+            <Button variant="consult" size="lg" onClick={() => {
+              setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+              setShowVideoCall(true);
+            }}>
               <Video className="h-5 w-5 mr-2" />
               Start Vet Consultation
             </Button>
@@ -173,7 +179,10 @@ const Pet = () => {
               eta="5 min"
               queuePosition={2}
               totalQueue={8}
-              onConsult={() => console.log("Starting pet video consultation")}
+              onConsult={() => {
+                setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+                setShowVideoCall(true);
+              }}
             />
             <ConsultCard
               type="audio"
@@ -181,7 +190,10 @@ const Pet = () => {
               description="Discuss pet symptoms and behavior with veterinary experts"
               doctorName="Anita Verma"
               specialty="General Veterinary"
-              onConsult={() => console.log("Starting pet audio consultation")}
+              onConsult={() => {
+                setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+                setShowVideoCall(true);
+              }}
               onCancel={() => console.log("Cancelling pet consultation")}
               onReschedule={() => console.log("Rescheduling pet consultation")}
             />
@@ -433,12 +445,28 @@ const Pet = () => {
                       <div className="font-medium">Dr. {vet.name}</div>
                       <div className="text-sm text-muted-foreground">{vet.specialty} • {vet.availability}</div>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/?tab=chatbot&context=pet')}>Start Chat</Button>
+                    <Button size="sm" onClick={() => {
+                      setSelectedVet({ name: vet.name, specialty: vet.specialty });
+                      setShowVideoCall(true);
+                    }}>Start Video Call</Button>
                   </div>
                 ))}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Video Call Modal */}
+        {showVideoCall && selectedVet && (
+          <VideoCall
+            consultationType="pet"
+            doctorName={selectedVet.name}
+            specialty={selectedVet.specialty}
+            onEndCall={() => {
+              setShowVideoCall(false);
+              setSelectedVet(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

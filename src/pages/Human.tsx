@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
 import DoctorCard from "@/components/DoctorCard";
+import VideoCall from "@/components/VideoCall";
 import { useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
@@ -30,6 +31,8 @@ const Human = () => {
   const [scheduleTime, setScheduleTime] = useState("");
   const [showSpecialists, setShowSpecialists] = useState(false);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<{ name: string; specialty: string } | null>(null);
 
 
   const specialties = [
@@ -118,7 +121,10 @@ const Human = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" onClick={() => navigate('/?tab=chatbot&context=human')}>
+            <Button variant="hero" size="lg" onClick={() => {
+              setSelectedDoctor({ name: "Priya Sharma", specialty: "General Medicine" });
+              setShowVideoCall(true);
+            }}>
               <Video className="h-5 w-5 mr-2" />
               Start Video Consultation
             </Button>
@@ -142,7 +148,10 @@ const Human = () => {
               eta="2 min"
               queuePosition={3}
               totalQueue={12}
-              onConsult={() => console.log("Starting video consultation")}
+              onConsult={() => {
+                setSelectedDoctor({ name: "Priya Sharma", specialty: "General Medicine" });
+                setShowVideoCall(true);
+              }}
             />
             <ConsultCard
               type="audio"
@@ -150,7 +159,10 @@ const Human = () => {
               description="Voice-only consultation optimized for low bandwidth areas"
               doctorName="Priya Sharma"
               specialty="General Medicine"
-              onConsult={() => console.log("Starting audio consultation")}
+              onConsult={() => {
+                setSelectedDoctor({ name: "Priya Sharma", specialty: "General Medicine" });
+                setShowVideoCall(true);
+              }}
               onCancel={() => console.log("Cancelling consultation")}
               onReschedule={() => console.log("Rescheduling consultation")}
             />
@@ -335,12 +347,28 @@ const Human = () => {
                       <div className="font-medium">Dr. {doc.name}</div>
                       <div className="text-sm text-muted-foreground">{doc.specialty} • {doc.availability}</div>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/?tab=chatbot&context=human')}>Start Chat</Button>
+                    <Button size="sm" onClick={() => {
+                      setSelectedDoctor({ name: doc.name, specialty: doc.specialty });
+                      setShowVideoCall(true);
+                    }}>Start Video Call</Button>
                   </div>
                 ))}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Video Call Modal */}
+        {showVideoCall && selectedDoctor && (
+          <VideoCall
+            consultationType="human"
+            doctorName={selectedDoctor.name}
+            specialty={selectedDoctor.specialty}
+            onEndCall={() => {
+              setShowVideoCall(false);
+              setSelectedDoctor(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );
