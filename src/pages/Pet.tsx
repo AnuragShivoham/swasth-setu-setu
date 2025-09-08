@@ -383,11 +383,19 @@ const Pet = () => {
             For urgent pet health situations, connect with emergency veterinarians immediately
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="emergency" size="lg" onClick={() => (window.location.href = 'tel:102')}>
+            <Button 
+              variant="emergency" 
+              size="lg" 
+              onClick={() => window.open('tel:102', '_self')}
+            >
               <Phone className="h-5 w-5 mr-2" />
               Emergency Vet Call
             </Button>
-            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
+            <Button 
+              variant="consult" 
+              size="lg" 
+              onClick={() => navigate('/?tab=chatbot&context=pet')}
+            >
               <MessageSquare className="h-5 w-5 mr-2" />
               Quick Vet Chat
             </Button>

@@ -284,12 +284,21 @@ const Human = () => {
           <p className="text-lg opacity-90 mb-6">
             For life-threatening situations, call emergency services immediately
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" onClick={() => (window.location.href = 'tel:108')}>
+           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              onClick={() => window.open('tel:108', '_self')}
+            >
               <Phone className="h-5 w-5 mr-2" />
               Call 108 (Emergency)
             </Button>
-            <Button variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-destructive" onClick={() => (window.location.href = 'tel:102')}>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-white border-white hover:bg-white hover:text-destructive" 
+              onClick={() => window.open('tel:102', '_self')}
+            >
               <Phone className="h-5 w-5 mr-2" />
               Call 102 (Medical)
             </Button>
