@@ -1,20 +1,38 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+from db import db
 from flask_jwt_extended import JWTManager
-import os
+from routes.auth_routes import auth_bp
+from routes.patient_routes import patient_bp
+from routes.doctor_routes import doctor_bp
+from routes.appointment_routes import appointment_bp
+from routes.consultation_routes import consultation_bp
+from routes.ai_routes import ai_bp
+from routes.upload_routes import upload_bp
+from routes.video_routes import video_bp
 
 app = Flask(__name__)
-
-# Load config
 app.config.from_object("config.Config")
 
-# Initialize extensions
-db = SQLAlchemy(app)
+# Enable CORS for frontend integration
+CORS(app)
+
+db.init_app(app)
 jwt = JWTManager(app)
 
-@app.route("/")
-def home():
-    return {"message": "Telemedicine AI Backend running!"}
+# Register blueprints
+app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(patient_bp, url_prefix='/patient')
+app.register_blueprint(doctor_bp, url_prefix='/doctor')
+app.register_blueprint(appointment_bp, url_prefix='/appointment')
+app.register_blueprint(consultation_bp, url_prefix='/consultation')
+app.register_blueprint(ai_bp, url_prefix='/ai')
+app.register_blueprint(upload_bp, url_prefix='/upload')
+app.register_blueprint(video_bp, url_prefix='/video')
 
-if __name__ == "__main__":
+# Create database tables
+with app.app_context():
+    db.create_all()
+
+if __name__ == '__main__':
     app.run(debug=True)
