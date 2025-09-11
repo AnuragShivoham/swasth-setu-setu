@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./tabFloatEffect.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
@@ -87,7 +88,7 @@ const Pet = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+  <div className="min-h-screen bg-background tab-float-effect">
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -328,7 +329,7 @@ const Pet = () => {
         {/* Pet Care Features */}
         <section>
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Why Choose SwasthSetu for Pet Healthcare?</h3>
+            <h3 className="text-2xl font-bold mb-4">Why Choose PAWMANITY for Pet Healthcare?</h3>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">

@@ -7,6 +7,9 @@ import { User, Heart, MessageCircle, Settings, Stethoscope, Phone, Image as Imag
 import manWithDogImage from "@/assets/man-with-dog.jpg";
 import DoctorChatbot from "@/components/DoctorChatbot";
 import PhotoDiagnosis from "@/components/PhotoDiagnosis";
+import logoTop from "@/assets/logo_top.jpg";
+import './tabFloatEffect.css';
+
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,8 +26,8 @@ const Home = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Stethoscope className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold">SwasthSetu</h1>
+              <img src={logoTop} alt="PAWMANITY Logo" className="h-10 w-auto" />
+              <h1 className="text-2xl font-bold">PAWMANITY</h1>
             </div>
             <Button variant="outline" onClick={() => setActiveTab("settings")}>
               <Settings className="h-4 w-4 mr-2" />
@@ -37,19 +40,19 @@ const Home = () => {
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
-            <TabsTrigger value="services" className="flex items-center gap-2">
+            <TabsTrigger value="services" className="tab-float-effect hanging-shadow flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Services
             </TabsTrigger>
-            <TabsTrigger value="chatbot" className="flex items-center gap-2">
+            <TabsTrigger value="chatbot" className="tab-float-effect hanging-shadow flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
               Doctor Chat
             </TabsTrigger>
-            <TabsTrigger value="photo" className="flex items-center gap-2">
+            <TabsTrigger value="photo" className="tab-float-effect hanging-shadow flex items-center gap-2">
               <ImageIcon className="h-4 w-4" />
               Photo Diagnosis
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="tab-float-effect hanging-shadow flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Settings
             </TabsTrigger>
@@ -62,50 +65,29 @@ const Home = () => {
                 Choose Your Healthcare Service
               </h2>
               <p className="text-xl trust-text max-w-2xl mx-auto">
-                SwasthSetu provides comprehensive healthcare for both humans and pets. 
+                PAWMANITY provides comprehensive healthcare for both humans and pets. 
                 Click on the image below to get started.
               </p>
             </div>
 
             {/* Interactive Image */}
-            <div className="relative max-w-4xl mx-auto">
-              <img 
-                src={manWithDogImage} 
-                alt="Man holding a dog - click for healthcare services"
-                className="w-full h-auto rounded-2xl shadow-[var(--shadow-consultation)]"
-              />
+            <div className="relative max-w-4xl mx-auto tab-float-effect hanging-shadow">
+                <img 
+                  src={manWithDogImage} 
+                  alt="Man holding a dog - click for healthcare services"
+                  className="w-full h-auto rounded-2xl shadow-[var(--shadow-consultation)] animate-float-slow tab-float-effect hanging-shadow"
+                />
               
               {/* Clickable Overlays */}
               <div className="absolute inset-0 flex">
-                {/* Human Healthcare Area - Left Side */}
-                <button
-                  onClick={() => navigate('/human')}
-                  className="flex-1 group relative overflow-hidden rounded-l-2xl hover:bg-primary/10 transition-all duration-300"
-                  aria-label="Human Healthcare Services"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg">
-                      <div className="flex items-center gap-2 text-primary font-semibold">
-                        <User className="h-5 w-5" />
-                        Human Healthcare
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Telemedicine for people
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Pet Healthcare Area - Right Side */}
+                {/* Pet Healthcare Area - Left Side */}
                 <button
                   onClick={() => navigate('/pet')}
-                  className="flex-1 group relative overflow-hidden rounded-r-2xl hover:bg-secondary/10 transition-all duration-300"
+                  className="flex-1 group relative overflow-hidden rounded-l-2xl hover:bg-secondary/10 transition-all duration-300 animate-float-pet delay-2000 group/hanging"
                   aria-label="Pet Healthcare Services"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-l from-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg">
+                  <div className="absolute inset-y-0 left-0 w-1/2 flex items-end justify-start">
+                    <div className="mb-4 ml-4 bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="flex items-center gap-2 text-secondary font-semibold">
                         <Heart className="h-5 w-5" />
                         Pet Healthcare
@@ -115,6 +97,27 @@ const Home = () => {
                       </p>
                     </div>
                   </div>
+                  <div className="absolute inset-0 bg-gradient-to-l from-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </button>
+
+                {/* Human Healthcare Area - Right Side */}
+                <button
+                  onClick={() => navigate('/human')}
+                  className="flex-1 group relative overflow-hidden rounded-r-2xl hover:bg-primary/10 transition-all duration-300 animate-float-human delay-1000 group/hanging"
+                  aria-label="Human Healthcare Services"
+                >
+                  <div className="absolute inset-y-0 right-0 w-1/2 flex items-end justify-end">
+                    <div className="mb-4 mr-4 bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="flex items-center gap-2 text-primary font-semibold">
+                        <User className="h-5 w-5" />
+                        Human Healthcare
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Telemedicine for people
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </button>
               </div>
             </div>
@@ -122,7 +125,7 @@ const Home = () => {
             {/* Service Cards */}
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               <Card 
-                className="consultation-card hover-scale cursor-pointer"
+                className="consultation-card hover-scale cursor-pointer tab-float-effect hanging-shadow"
                 onClick={() => navigate('/human')}
               >
                 <CardHeader>
@@ -143,14 +146,14 @@ const Home = () => {
                     <li>• 5000+ verified doctors</li>
                     <li>• Emergency support 24/7</li>
                   </ul>
-                  <Button variant="hero" className="w-full mt-4">
+                  <Button variant="hero" className="w-full mt-4 tab-float-effect hanging-shadow">
                     Access Human Healthcare
                   </Button>
                 </CardContent>
               </Card>
 
               <Card 
-                className="consultation-card hover-scale cursor-pointer"
+                className="consultation-card hover-scale cursor-pointer tab-float-effect hanging-shadow"
                 onClick={() => navigate('/pet')}
               >
                 <CardHeader>
@@ -171,7 +174,7 @@ const Home = () => {
                     <li>• Emergency pet care</li>
                     <li>• Nutrition guidance</li>
                   </ul>
-                  <Button variant="consult" className="w-full mt-4">
+                  <Button variant="consult" className="w-full mt-4 tab-float-effect hanging-shadow">
                     Access Pet Healthcare
                   </Button>
                 </CardContent>
@@ -203,7 +206,7 @@ const Home = () => {
               <CardHeader>
                 <CardTitle>Settings</CardTitle>
                 <CardDescription>
-                  Manage your SwasthSetu preferences and account settings
+                  Manage your PAWMANITY preferences and account settings
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

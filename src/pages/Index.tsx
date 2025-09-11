@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import "./tabFloatEffect.css";
 import { Card, CardContent } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
 import DoctorCard from "@/components/DoctorCard";
@@ -105,11 +106,11 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="text-lg px-8">
-                  Start Consultation Now
+                <Button variant="hero" size="lg" className="text-lg px-8 tab-float-effect" onClick={() => window.location.href = '/human'}>
+                  Human Healthcare
                 </Button>
-                <Button variant="medical" size="lg" className="text-lg px-8">
-                  Book Appointment
+                <Button variant="medical" size="lg" className="text-lg px-8 tab-float-effect" onClick={() => window.location.href = '/pet'}>
+                  Pet Healthcare
                 </Button>
               </div>
 
