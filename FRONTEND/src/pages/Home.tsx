@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User, Heart, MessageCircle, Settings, Stethoscope, Phone, Image as ImageIcon } from "lucide-react";
+import { User, Heart, MessageCircle, Settings, Stethoscope, Phone, Image as ImageIcon, LogOut } from "lucide-react";
 import manWithDogImage from "@/assets/man-with-dog.jpg";
 import DoctorChatbot from "@/components/DoctorChatbot";
 import PhotoDiagnosis from "@/components/PhotoDiagnosis";
 import logoTop from "@/assets/logo_top.jpg";
+import { useAuth } from "@/contexts/AuthContext";
 import './tabFloatEffect.css';
 
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const context = params.get("context");
   const chatInitial = context === "pet" ? "My pet needs help" : context === "human" ? "I need a doctor consultation" : undefined;
+  const { username, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,10 +31,28 @@ const Home = () => {
               <img src={logoTop} alt="PAWMANITY Logo" className="h-10 w-auto" />
               <h1 className="text-2xl font-bold">PAWMANITY</h1>
             </div>
-            <Button variant="outline" onClick={() => setActiveTab("settings")}>
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </Button>
+            <div className="flex items-center gap-4">
+              {username && (
+                <span className="text-sm text-muted-foreground">
+                  Welcome, {username}
+                </span>
+              )}
+              <Button variant="outline" onClick={() => setActiveTab("settings")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -258,7 +278,15 @@ const Home = () => {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <Button variant="destructive" size="sm">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </Button>
                 </div>
