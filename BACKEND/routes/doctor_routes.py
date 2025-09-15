@@ -64,7 +64,7 @@ def get_doctor_profile():
 
     doctor = Doctor.query.filter_by(user_id=current_user.id).first()
     if not doctor:
-        return jsonify({"error": "Doctor profile not found"}), 404
+        return jsonify({"error": f"Doctor profile not found for user {current_user.username} with id {current_user.id}"}), 404
 
     return jsonify({
         "id": doctor.id,
@@ -166,3 +166,34 @@ def get_doctor_patients():
             seen_patient_ids.add(appointment.patient_id)
 
     return jsonify(patients)
+
+# New endpoint to fix missing doctor profiles
+@doctor_bp.route("/fix-profiles", methods=["POST"])
+@jwt_required()
+def fix_missing_doctor_profiles():
+    """Create missing doctor profiles for existing doctor users"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    if current_user.role != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+
+    doctor_users = User.query.filter_by(role="doctor").all()
+    created_profiles = []
+    for user in doctor_users:
+        doctor = Doctor.query.filter_by(user_id=user.id).first()
+        if not doctor:
+            # Create default doctor profile
+            new_doctor = Doctor(
+                user_id=user.id,
+                name=user.username,
+                specialization="General Medicine",
+                license_number=f"LIC-{user.id:04d}",
+                is_available=True
+            )
+            db.session.add(new_doctor)
+            created_profiles.append(user.username)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Missing doctor profiles created",
+        "created_profiles": created_profiles
+    })

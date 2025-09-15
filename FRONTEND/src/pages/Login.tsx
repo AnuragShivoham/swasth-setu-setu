@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { User, Lock } from "lucide-react";
+import Beams from "@/components/Beams";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -24,6 +25,7 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log("Submitting login for user:", username);
       const response = await fetch("http://localhost:5000/auth/login", {
         method: "POST",
         headers: {
@@ -32,13 +34,16 @@ const Login = () => {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log("Response status:", response.status);
       const data = await response.json();
+      console.log("Response data:", data);
 
       if (response.ok && data.token && data.role) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", username);
         localStorage.setItem("role", data.role);
 
+        console.log("Navigating based on role:", data.role);
         // Navigate based on role
         if (data.role === "doctor") {
           navigate("/doctor", { replace: true });
@@ -49,6 +54,7 @@ const Login = () => {
         setError(data.error || "Login failed");
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError("Network error. Please check if the backend is running.");
     } finally {
       setLoading(false);
@@ -60,8 +66,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4 relative overflow-hidden">
+      <div className="absolute inset-0 brightness-75 contrast-125 -z-10">
+        <Beams />
+      </div>
+      <Card className="w-full max-w-md relative z-10 bg-white/60 backdrop-blur-lg shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl rounded-2xl p-8 mx-4">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to PAWMANITY</CardTitle>
           <CardDescription>

@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import db, User, Patient, Diagnosis
+from db import get_mongo_collection
 import random  # For placeholder AI response
+import datetime
 
 ai_bp = Blueprint("ai", __name__)
 
@@ -84,3 +86,59 @@ def get_diagnoses():
         })
 
     return jsonify(result)
+
+@ai_bp.route("/diagnose/logs", methods=["POST"])
+@jwt_required()
+def log_ai_interaction():
+    """Log AI diagnosis interaction details in MongoDB"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+
+    data = request.get_json()
+    diagnosis_id = data.get("diagnosis_id")
+    raw_ai_response = data.get("raw_ai_response", {})
+    processing_time = data.get("processing_time", 0)
+    model_version = data.get("model_version", "v1.0")
+
+    # Get MongoDB collection for AI logs
+    ai_logs_collection = get_mongo_collection("ai_diagnosis_logs")
+
+    # Create log entry
+    log_entry = {
+        "user_id": current_user.id,
+        "diagnosis_id": diagnosis_id,
+        "timestamp": datetime.datetime.utcnow(),
+        "raw_ai_response": raw_ai_response,
+        "processing_time_ms": processing_time,
+        "model_version": model_version,
+        "user_agent": request.headers.get("User-Agent"),
+        "ip_address": request.remote_addr
+    }
+
+    # Insert into MongoDB
+    result = ai_logs_collection.insert_one(log_entry)
+
+    return jsonify({
+        "message": "AI interaction logged successfully",
+        "log_id": str(result.inserted_id)
+    }), 201
+
+@ai_bp.route("/diagnose/logs/<diagnosis_id>", methods=["GET"])
+@jwt_required()
+def get_ai_logs(diagnosis_id):
+    """Get AI diagnosis logs from MongoDB"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+
+    # Get MongoDB collection for AI logs
+    ai_logs_collection = get_mongo_collection("ai_diagnosis_logs")
+
+    # Find logs for this diagnosis and user
+    logs = list(ai_logs_collection.find(
+        {"diagnosis_id": int(diagnosis_id), "user_id": current_user.id}
+    ).sort("timestamp", -1))
+
+    # Convert ObjectId to string for JSON serialization
+    for log in logs:
+        log["_id"] = str(log["_id"])
+        log["timestamp"] = log["timestamp"].isoformat()
+
+    return jsonify(logs)

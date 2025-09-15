@@ -37,6 +37,8 @@ class Doctor(db.Model):
     experience_years = db.Column(db.Integer, nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     bio = db.Column(db.Text, nullable=True)
+    # Removed qualifications column to fix DB schema mismatch
+    # qualifications = db.Column(db.Text, nullable=True)
     is_available = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -77,6 +79,19 @@ class Message(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     message_type = db.Column(db.String(20), default="text")  # text, image, file
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    notification_type = db.Column(db.String(50), default="general")  # appointment, consultation, system
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    related_id = db.Column(db.Integer, nullable=True)  # ID of related object (appointment, consultation, etc.)
+
+    # Relationships
+    user = db.relationship('User', backref='notifications')
 
 class Diagnosis(db.Model):
     id = db.Column(db.Integer, primary_key=True)

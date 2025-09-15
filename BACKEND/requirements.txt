@@ -7,3 +7,6 @@ pytest
 werkzeug
 flask-mail
 flask-socketio
+pillow
+psycopg2-binary  # PostgreSQL driver
+pymongo  # MongoDB driver

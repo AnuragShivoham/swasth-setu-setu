@@ -9,7 +9,7 @@
 ## 2. Add File Upload for Medical Images
 - [x] Add MedicalImage model to models.py
 - [x] Create upload_routes.py for file upload handling
-- [ ] Install and configure Flask-Uploads or similar
+- [x] Install and configure Flask-Uploads or similar
 - [x] Add image storage directory and validation
 - [ ] Integrate with AI diagnosis for image analysis
 
@@ -27,14 +27,14 @@
 - [ ] Add message search and filtering
 
 ## 5. Add Notification System
-- [ ] Add Notification model to models.py
-- [ ] Create notification_routes.py
+- [x] Add Notification model to models.py
+- [x] Create notification_routes.py
 - [ ] Add email notifications (Flask-Mail)
-- [ ] Add in-app notifications
+- [x] Add in-app notifications
 - [ ] Integrate notifications with appointments, consultations, etc.
 
 ## General Updates
 - [x] Update requirements.txt with new dependencies
 - [x] Update app.py to register new blueprints
 - [x] Add configuration for new features in config.py
-- [ ] Update README.md with new features documentation
+- [x] Update README.md with new features documentation

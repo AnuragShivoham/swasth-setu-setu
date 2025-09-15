@@ -23,8 +23,8 @@
 - [x] Implement AI-powered diagnosis (placeholder for now)
 - [x] Add file upload for medical images
 - [x] Add video call session management
-- [x] Add chat/message system
-- [x] Add notification system
+- [x] Add basic chat/message system
+- [x] Add notification system (in-app, email setup)
 
 ## Phase 5: Testing and Validation
 - [ ] Update and expand test files

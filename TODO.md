@@ -1,0 +1,2 @@
+- [x] Remove the green GradientBlinds background from the entire doctor page (Doctor.tsx)
+- [x] Apply the green background to only the doctor profile pages (the profile header card and the tab content cards)
