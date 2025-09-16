@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, Clock, Languages, Phone, MapPin, User, FileText, Award, MessageSquare } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Star, Clock, Languages, Phone, MapPin, User, FileText, Award, MessageSquare, Video, Bell, Check, X, AlertCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import GradientBlinds from "./GradientBlinds";
 import Beams from "../components/Beams";
@@ -30,6 +31,11 @@ const Doctor = () => {
   const [loading, setLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [callRequests, setCallRequests] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [showResponseDialog, setShowResponseDialog] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const previousPathnameRef = useRef<string | null>(null);
 
   const fetchProfile = async () => {
@@ -69,8 +75,91 @@ const Doctor = () => {
     }
   };
 
+  const fetchCallRequests = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:5000/notification/call-requests', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        method: "GET",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCallRequests(data.call_requests || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch call requests:", error);
+    }
+  };
+
+  const fetchOnlineStatus = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:5000/doctor/status/online', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        method: "GET",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsOnline(data.is_online);
+      }
+    } catch (error) {
+      console.error("Failed to fetch online status:", error);
+    }
+  };
+
+  const toggleOnlineStatus = async () => {
+    if (!token) {
+      console.error("No token available");
+      return;
+    }
+    try {
+      console.log("Toggling online status. Current:", isOnline, "New:", !isOnline);
+      const res = await fetch('http://localhost:5000/doctor/status/online', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ is_online: !isOnline }),
+      });
+      console.log("API Response status:", res.status);
+      if (res.ok) {
+        const data = await res.json();
+        console.log("API Response data:", data);
+        setIsOnline(data.is_online);
+        toast({
+          title: "Status Updated",
+          description: `You are now ${data.is_online ? 'online' : 'offline'}`,
+        });
+      } else {
+        const errorText = await res.text();
+        console.error("API Error:", res.status, errorText);
+        toast({
+          title: "Error",
+          description: `Failed to update online status (${res.status})`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to toggle online status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update online status",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
+    fetchCallRequests();
+    fetchOnlineStatus();
   }, [token, refreshTrigger]);
 
   useEffect(() => {
@@ -79,6 +168,100 @@ const Doctor = () => {
     }
     previousPathnameRef.current = location.pathname;
   }, [location.pathname]);
+
+  // Fetch call requests periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchCallRequests();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const handleAcceptCall = async (request: any) => {
+    try {
+      // Mark notification as read and respond to the call request
+      await fetch(`http://localhost:5000/notification/${request.id}/read`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      });
+
+      // Send acceptance response to the patient
+      const response = await fetch(`http://localhost:5000/notification/call-request/${request.id}/respond`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ response: 'accepted' }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.session) {
+        // Start video/audio session
+        toast({
+          title: "Call Request Accepted",
+          description: `Video session started with ${request.patient_name}. Session ID: ${data.session.session_id}`,
+        });
+
+        // Navigate to video call or handle session
+        // For now, we'll show a success message
+        // You could navigate to a video call component here
+        console.log("Session started:", data.session);
+      } else {
+        toast({
+          title: "Call Request Accepted",
+          description: `You have accepted the call request from ${request.patient_name}. The patient will be notified.`,
+        });
+      }
+
+      setShowResponseDialog(false);
+      fetchCallRequests(); // Refresh the list
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to accept call request",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRejectCall = async (request: any) => {
+    try {
+      // Mark notification as read
+      await fetch(`http://localhost:5000/notification/${request.id}/read`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      });
+
+      toast({
+        title: "Call Rejected",
+        description: `Call request from ${request.patient_name} has been rejected`,
+      });
+
+      setShowResponseDialog(false);
+      fetchCallRequests(); // Refresh the list
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reject call request",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getCallTypeIcon = (message: string) => {
+    if (message.toLowerCase().includes('video')) return <Video className="h-4 w-4" />;
+    if (message.toLowerCase().includes('audio')) return <Phone className="h-4 w-4" />;
+    return <MessageSquare className="h-4 w-4" />;
+  };
 
   if (loading) {
     return (
@@ -137,6 +320,14 @@ const Doctor = () => {
             </div>
           </CardHeader>
         </Card>
+
+        {/* Call Requests Notification */}
+        {callRequests.length > 0 && (
+          <div className="p-4 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-900 italic">
+            <Bell className="inline-block mr-2" />
+            You have {callRequests.length} new call request{callRequests.length > 1 ? 's' : ''}.
+          </div>
+        )}
 
         {/* Profile Details in Tabs */}
         <Tabs defaultValue="professional" className="w-full">
@@ -263,6 +454,59 @@ const Doctor = () => {
           </TabsContent>
         </Tabs>
 
+        {/* Call Requests List */}
+        {callRequests.length > 0 && (
+          <Card className="border-2 border-yellow-300 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold italic text-yellow-800 flex items-center gap-2">
+                <Bell className="w-5 h-5" />
+                Incoming Call Requests
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {callRequests.map((request) => (
+                <div key={request.id} className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {getCallTypeIcon(request.message)}
+                    <div>
+                      <div className="font-medium text-yellow-900">{request.patient_name}</div>
+                      <div className="text-sm text-yellow-700">{request.message}</div>
+                      <div className="text-xs text-yellow-600">{new Date(request.created_at).toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => {
+                        setSelectedRequest(request);
+                        setShowResponseDialog(true);
+                      }}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Respond
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Online Status Toggle */}
+        <div className="flex justify-center mb-4">
+          <Button
+            onClick={toggleOnlineStatus}
+            className={`px-6 py-2 rounded-full italic font-semibold transition-colors ${
+              isOnline
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-gray-600 hover:bg-gray-700 text-white'
+            }`}
+          >
+            {isOnline ? 'Go Offline' : 'Go Online'}
+          </Button>
+        </div>
+
         {/* Action Buttons */}
         <div className="flex gap-4 justify-center">
           <Button
@@ -282,6 +526,52 @@ const Doctor = () => {
             Edit Profile
           </Button>
         </div>
+
+        {/* Call Response Dialog */}
+        <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Respond to Call Request</DialogTitle>
+              <DialogDescription>
+                {selectedRequest && `Respond to ${selectedRequest.patient_name}'s call request`}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedRequest && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    {getCallTypeIcon(selectedRequest.message)}
+                    <span className="font-medium">{selectedRequest.patient_name}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{selectedRequest.message}</p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (selectedRequest) {
+                    handleRejectCall(selectedRequest);
+                  }
+                }}
+              >
+                <X className="h-4 w-4 mr-1" />
+                Reject
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedRequest) {
+                    handleAcceptCall(selectedRequest);
+                  }
+                }}
+              >
+                <Check className="h-4 w-4 mr-1" />
+                Accept Request
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

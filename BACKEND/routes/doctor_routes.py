@@ -117,9 +117,68 @@ def get_available_doctors():
             "name": doctor.name,
             "specialization": doctor.specialization,
             "experience_years": doctor.experience_years,
-            "bio": doctor.bio
+            "bio": doctor.bio,
+            "is_online": doctor.is_online,
+            "last_seen": doctor.last_seen.isoformat() if doctor.last_seen else None
         })
     return jsonify(result)
+
+@doctor_bp.route("/online", methods=["GET"])
+def get_online_doctors():
+    """Get list of online doctors"""
+    doctors = Doctor.query.filter_by(is_online=True, is_available=True).all()
+    result = []
+    for doctor in doctors:
+        result.append({
+            "id": doctor.id,
+            "name": doctor.name,
+            "specialization": doctor.specialization,
+            "experience_years": doctor.experience_years,
+            "bio": doctor.bio,
+            "last_seen": doctor.last_seen.isoformat() if doctor.last_seen else None
+        })
+    return jsonify(result)
+
+@doctor_bp.route("/status/online", methods=["POST"])
+@jwt_required()
+def set_online_status():
+    """Set doctor online status"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    if current_user.role != "doctor":
+        return jsonify({"error": "Doctor access required"}), 403
+
+    doctor = Doctor.query.filter_by(user_id=current_user.id).first()
+    if not doctor:
+        return jsonify({"error": "Doctor profile not found"}), 404
+
+    data = request.get_json()
+    is_online = data.get('is_online', False)
+
+    doctor.is_online = is_online
+    doctor.last_seen = datetime.utcnow()
+    db.session.commit()
+
+    return jsonify({
+        "message": f"Doctor status set to {'online' if is_online else 'offline'}",
+        "is_online": doctor.is_online
+    })
+
+@doctor_bp.route("/status/online", methods=["GET"])
+@jwt_required()
+def get_online_status():
+    """Get current doctor's online status"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    if current_user.role != "doctor":
+        return jsonify({"error": "Doctor access required"}), 403
+
+    doctor = Doctor.query.filter_by(user_id=current_user.id).first()
+    if not doctor:
+        return jsonify({"error": "Doctor profile not found"}), 404
+
+    return jsonify({
+        "is_online": doctor.is_online,
+        "last_seen": doctor.last_seen.isoformat() if doctor.last_seen else None
+    })
 
 @doctor_bp.route("/<int:doctor_id>", methods=["GET"])
 def get_doctor(doctor_id):

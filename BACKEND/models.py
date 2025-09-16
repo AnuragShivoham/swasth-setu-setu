@@ -40,6 +40,8 @@ class Doctor(db.Model):
     # Removed qualifications column to fix DB schema mismatch
     # qualifications = db.Column(db.Text, nullable=True)
     is_available = db.Column(db.Boolean, default=True)
+    is_online = db.Column(db.Boolean, default=False)
+    last_seen = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

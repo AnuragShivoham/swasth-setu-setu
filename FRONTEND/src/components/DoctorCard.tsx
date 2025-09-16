@@ -1,6 +1,10 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, MapPin, Clock, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, MapPin, Clock, Globe, Video, Phone, MessageSquare } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface DoctorCardProps {
   name: string;
@@ -11,6 +15,7 @@ interface DoctorCardProps {
   location: string;
   availability: string;
   isOnline: boolean;
+  doctorId?: number; // Add doctor ID for call requests
 }
 
 const DoctorCard = ({
@@ -22,7 +27,55 @@ const DoctorCard = ({
   location,
   availability,
   isOnline,
+  doctorId,
 }: DoctorCardProps) => {
+  const { token } = useAuth();
+  const { toast } = useToast();
+  const [isRequesting, setIsRequesting] = useState(false);
+
+  const handleCallRequest = async (callType: 'video' | 'audio' | 'text') => {
+    if (!doctorId || !token) return;
+
+    setIsRequesting(true);
+    try {
+      const response = await fetch('http://localhost:5000/notification/call-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          doctor_id: doctorId,
+          call_type: callType,
+          message: `Requesting ${callType} consultation`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Request Sent",
+          description: `Your ${callType} call request has been sent to Dr. ${name}`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to send request",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send request",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRequesting(false);
+    }
+  };
+
   return (
     <Card className="doctor-card">
       <CardContent className="p-6">
@@ -82,6 +135,42 @@ const DoctorCard = ({
                 </span>
               </div>
             </div>
+
+            {/* Call Request Buttons */}
+            {doctorId && (
+              <div className="flex gap-2 mt-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCallRequest('video')}
+                  disabled={isRequesting}
+                  className="flex-1"
+                >
+                  <Video className="h-4 w-4 mr-1" />
+                  Video
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCallRequest('audio')}
+                  disabled={isRequesting}
+                  className="flex-1"
+                >
+                  <Phone className="h-4 w-4 mr-1" />
+                  Audio
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCallRequest('text')}
+                  disabled={isRequesting}
+                  className="flex-1"
+                >
+                  <MessageSquare className="h-4 w-4 mr-1" />
+                  Text
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

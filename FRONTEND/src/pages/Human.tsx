@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./tabFloatEffect.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,12 +6,13 @@ import ConsultCard from "@/components/ConsultCard";
 import DoctorCard from "@/components/DoctorCard";
 import VideoCall from "@/components/VideoCall";
 import { useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  User, 
-  Video, 
-  Phone, 
-  MessageSquare, 
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  ArrowLeft,
+  User,
+  Video,
+  Phone,
+  MessageSquare,
   Calendar,
   Shield,
   Clock,
@@ -21,6 +22,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 
 const Human = () => {
@@ -34,6 +36,11 @@ const Human = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
   const [showVideoCall, setShowVideoCall] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<{ name: string; specialty: string } | null>(null);
+  const [showCallRequest, setShowCallRequest] = useState(false);
+  const [callRequestDoctor, setCallRequestDoctor] = useState<any>(null);
+  const [callType, setCallType] = useState<'video' | 'audio' | 'text'>('video');
+  const [callMessage, setCallMessage] = useState("");
+  const { token } = useAuth();
 
 
   const specialties = [
@@ -45,38 +52,111 @@ const Human = () => {
     { name: "Psychiatry", doctors: 180, available: 8 }
   ];
 
-  const availableDoctors = [
-    {
-      name: "Priya Sharma",
-      specialty: "General Medicine",
-      experience: "8+ years",
-      rating: 4.8,
-      languages: ["Hindi", "English"],
-      location: "Delhi",
-      availability: "Available now",
-      isOnline: true
-    },
-    {
-      name: "Rajesh Kumar",
-      specialty: "Cardiology",
-      experience: "12+ years",
-      rating: 4.9,
-      languages: ["Hindi", "English", "Punjabi"],
-      location: "Mumbai", 
-      availability: "Next: 15 min",
-      isOnline: false
-    },
-    {
-      name: "Meera Patel",
-      specialty: "Dermatology",
-      experience: "6+ years",
-      rating: 4.7,
-      languages: ["Hindi", "English", "Gujarati"],
-      location: "Ahmedabad",
-      availability: "Available now",
-      isOnline: true
+  const [availableDoctors, setAvailableDoctors] = useState<any[]>([]);
+
+  // Fetch real registered doctors from backend
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        // First try to get online doctors, fallback to available doctors
+        let res = await fetch('http://localhost:5000/doctor/online');
+        let data = await res.json();
+
+        // If no online doctors found, try available doctors
+        if (!data || data.length === 0) {
+          console.log("No online doctors found, fetching available doctors...");
+          res = await fetch('http://localhost:5000/doctor/available');
+          data = await res.json();
+        }
+
+        if (res.ok && data && data.length > 0) {
+          // Map doctors to expected format with default values for missing fields
+          const doctors = data.map((doc: any) => ({
+            name: doc.name,
+            specialty: doc.specialization,
+            experience: doc.experience_years ? `${doc.experience_years}+ years` : "Not specified",
+            rating: 4.8, // Placeholder rating, can be fetched from backend if available
+            languages: ["Hindi", "English"], // Placeholder languages
+            location: "Unknown", // Placeholder location
+            availability: doc.is_available ? "Available now" : "Unavailable",
+            isOnline: doc.is_online === true, // Ensure boolean true for online status
+            doctorId: doc.id
+          }));
+          setAvailableDoctors(doctors);
+          console.log(`Loaded ${doctors.length} doctors`);
+        } else {
+          console.log("No doctors data received");
+        }
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  // Additional state for call requests
+  const [callRequests, setCallRequests] = useState<any[]>([]);
+
+  // Function to handle call request
+  const handleCallRequest = async (doctor: any, type: 'video' | 'audio' | 'text') => {
+    if (!token) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login to send call requests",
+        variant: "destructive",
+      });
+      return;
     }
-  ];
+
+    try {
+      console.log("Sending call request", { doctorId: doctor.doctorId, callType: type, message: callMessage, token });
+      const response = await fetch('http://localhost:5000/notification/call-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          doctor_id: doctor.doctorId,
+          call_type: type,
+          message: callMessage,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Call request response", data);
+
+      if (response.ok) {
+        toast({
+          title: "Call Request Sent",
+          description: `Your ${type} call request has been sent to Dr. ${doctor.name}`,
+        });
+        setShowCallRequest(false);
+        setCallRequestDoctor(null);
+        setCallMessage("");
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to send call request",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Call request error", error);
+      toast({
+        title: "Error",
+        description: "Failed to send call request. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Function to open call request dialog
+  const openCallRequestDialog = (doctor: any, type: 'video' | 'audio' | 'text') => {
+    setCallRequestDoctor(doctor);
+    setCallType(type);
+    setShowCallRequest(true);
+  };
 
   return (
   <div className="min-h-screen bg-background tab-float-effect">
@@ -216,7 +296,7 @@ const Human = () => {
           
           <div className="grid lg:grid-cols-3 gap-6 mb-8">
             {availableDoctors.map((doctor, index) => (
-              <DoctorCard key={index} {...doctor} />
+              <DoctorCard key={doctor.doctorId || index} {...doctor} doctorId={doctor.doctorId} />
             ))}
           </div>
           
@@ -343,24 +423,53 @@ const Human = () => {
 
         {/* Specialists Dialog */}
         <Dialog open={showSpecialists} onOpenChange={setShowSpecialists}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedSpecialty ? `${selectedSpecialty} Specialists` : 'All Doctors'}</DialogTitle>
-              <DialogDescription>Select a doctor to start chat.</DialogDescription>
+              <DialogDescription>Choose a doctor and consultation type.</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {availableDoctors
                 .filter(d => !selectedSpecialty || d.specialty === selectedSpecialty)
                 .map((doc, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
-                    <div>
-                      <div className="font-medium">Dr. {doc.name}</div>
-                      <div className="text-sm text-muted-foreground">{doc.specialty} • {doc.availability}</div>
+                  <div key={i} className="flex items-center justify-between p-4 rounded-lg border bg-card">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${doc.isOnline ? 'bg-success' : 'bg-muted'}`} />
+                      <div>
+                        <div className="font-medium">Dr. {doc.name}</div>
+                        <div className="text-sm text-muted-foreground">{doc.specialty} • {doc.experience}</div>
+                        <div className="text-xs text-muted-foreground">{doc.availability}</div>
+                      </div>
                     </div>
-                    <Button size="sm" onClick={() => {
-                      setSelectedDoctor({ name: doc.name, specialty: doc.specialty });
-                      setShowVideoCall(true);
-                    }}>Start Video Call</Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openCallRequestDialog(doc, 'video')}
+                        className="flex items-center gap-1"
+                      >
+                        <Video className="h-4 w-4" />
+                        Video
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openCallRequestDialog(doc, 'audio')}
+                        className="flex items-center gap-1"
+                      >
+                        <Phone className="h-4 w-4" />
+                        Audio
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openCallRequestDialog(doc, 'text')}
+                        className="flex items-center gap-1"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        Text
+                      </Button>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -379,6 +488,76 @@ const Human = () => {
             }}
           />
         )}
+
+        {/* Call Request Dialog */}
+        <Dialog open={showCallRequest} onOpenChange={setShowCallRequest}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Send Call Request</DialogTitle>
+              <DialogDescription>
+                Send a {callType} call request to Dr. {callRequestDoctor?.name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="call-type" className="text-right">Call Type</Label>
+                <div className="col-span-3">
+                  <div className="flex gap-2">
+                    <Button
+                      variant={callType === 'video' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCallType('video')}
+                    >
+                      <Video className="h-4 w-4 mr-1" />
+                      Video
+                    </Button>
+                    <Button
+                      variant={callType === 'audio' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCallType('audio')}
+                    >
+                      <Phone className="h-4 w-4 mr-1" />
+                      Audio
+                    </Button>
+                    <Button
+                      variant={callType === 'text' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setCallType('text')}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-1" />
+                      Text
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="message" className="text-right">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Briefly describe your symptoms or reason for consultation..."
+                  className="col-span-3"
+                  value={callMessage}
+                  onChange={(e) => setCallMessage(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCallRequest(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (callRequestDoctor) {
+                    handleCallRequest(callRequestDoctor, callType);
+                  }
+                }}
+              >
+                Send Request
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
