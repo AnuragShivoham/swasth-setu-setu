@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for Pawmanity project",
+  "main": "app.py",
+  "scripts": {
+    "test": "pytest BACKEND/tests --maxfail=1 --disable-warnings -q"
+  }
+}

@@ -1,0 +1,81 @@
+.tab-float-effect {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-float-effect:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 8px 24px 0 rgba(0, 102, 255, 0.35);
+}
+
+.group\/hanging:hover {
+  animation: hanging 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 16px 40px 0 rgba(0, 102, 255, 0.35);
+}
+
+@keyframes hanging {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+    box-shadow: 0 8px 24px 0 rgba(0, 102, 255, 0.18);
+  }
+  20% {
+    transform: translateY(-6px) rotate(2deg);
+    box-shadow: 0 12px 32px 0 rgba(0, 102, 255, 0.22);
+  }
+  50% {
+    transform: translateY(-12px) rotate(-2deg);
+    box-shadow: 0 16px 40px 0 rgba(0, 102, 255, 0.28);
+  }
+  80% {
+    transform: translateY(-6px) rotate(2deg);
+    box-shadow: 0 12px 32px 0 rgba(0, 102, 255, 0.22);
+  }
+}
+
+.hanging-shadow {
+  box-shadow: 0 8px 24px 0 rgba(0, 102, 255, 0.18);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+what effect it will create
+
+.hanging-shadow:hover {
+  box-shadow: 0 16px 40px 0 rgba(0, 102, 255, 0.35);
+}
+
+body, .min-h-screen {
+  position: relative;
+}
+
+/* Removed floating PAWMANITY background effect */
+/*
+.floating-pawmanity-left, .floating-pawmanity-right {
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  font-size: 7vw;
+  font-weight: bold;
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.floating-pawmanity-left {
+  left: 0;
+  color: var(--tw-prose-body, #2563eb);
+  animation: float-left 16s linear infinite;
+}
+.floating-pawmanity-right {
+  right: 0;
+  color: var(--tw-prose-body, #059669);
+  animation: float-right 16s linear infinite;
+}
+@keyframes float-left {
+  0% { transform: translateX(-40vw); opacity: 0.08; }
+  50% { transform: translateX(40vw); opacity: 0.12; }
+  100% { transform: translateX(-40vw); opacity: 0.08; }
+}
+@keyframes float-right {
+  0% { transform: translateX(40vw); opacity: 0.08; }
+  50% { transform: translateX(-40vw); opacity: 0.12; }
+  100% { transform: translateX(40vw); opacity: 0.08; }
+}
+*/

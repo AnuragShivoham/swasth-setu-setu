@@ -1,0 +1,47 @@
+{
+  "Anurag": {
+    "id": "1",
+    "username": "Anurag",
+    "password": "scrypt:32768:8:1$TmksGxE82GiXmOV8$ea463ab83f47f46f2b660fb4a973571b09daaa3a1ebb28c679f266c762515de871fd55247e909a912cdf575ba4dfafd970f376d15b0c05b1bcdf91c9ff403f09",
+    "email": "2k24.cs1e.2414128@gmail.com",
+    "role": "doctor",
+    "created_at": "2025-09-12T13:50:10.255821",
+    "profile": {}
+  },
+  "Anurag_": {
+    "id": "2",
+    "username": "Anurag_",
+    "password": "scrypt:32768:8:1$e1Fg1Umcueuo62nO$89c6dbcacd60847865e4a2ea5fba4fd04934e6ee410f77156d29eb4868156fc654779d1880cbfddb743e63a80d6f74610ab5dc7d4d7c56f22e475d8df3fcb19c",
+    "email": "anuragkushwaha2207@outlook.com",
+    "role": "doctor",
+    "created_at": "2025-09-12T13:56:07.482201",
+    "profile": {}
+  },
+  "Anurag@": {
+    "id": "3",
+    "username": "Anurag@",
+    "password": "scrypt:32768:8:1$mtaQkKQaNrayuUUJ$b8d36faba92d366e7a990e68d51b09db8b48be2dc032ad4aa23559564ceae8bd3976b5953e79c953c87de47e3b1d7b7283be14bf963521c24e5ee7055fc548a5",
+    "email": "2k24.cs1e.2413881@gmail.com",
+    "role": "doctor",
+    "created_at": "2025-09-12T14:01:58.608214",
+    "profile": {}
+  },
+  "annu": {
+    "id": "4",
+    "username": "annu",
+    "password": "scrypt:32768:8:1$zMkD20rj5AmA5Na3$73929e122af507bb55b5058cd92e1f880316420460680f847b38e3e3663c33f3340b8b6635cfbc002dccd3533fe9104b15c0c842d2f336eb2978a35f6313b51c",
+    "email": "vermaanni2003@gmail.com",
+    "role": "doctor",
+    "created_at": "2025-09-12T14:09:07.788883",
+    "profile": {}
+  },
+  "ME": {
+    "id": "5",
+    "username": "ME",
+    "password": "scrypt:32768:8:1$KRjforwwXb82cdIx$9df072f855828f6849cb5df1b988cd72a22e2fe7d2c6e8a815686e714788aeff8dae60edd52da323e0659ab7592aa58ba7bdab870812a9f191fd703d3b0c2b48",
+    "email": "ps591362@gmail.com",
+    "role": "patient",
+    "created_at": "2025-09-12T14:11:24.699673",
+    "profile": {}
+  }
+}
