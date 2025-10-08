@@ -239,10 +239,26 @@ def respond_to_call_request(notification_id):
         elif 'text' in notification.message.lower():
             call_type = 'text'
 
+        # Check if an appointment exists between doctor and patient
+        from models import Appointment
+        appointment = Appointment.query.filter_by(doctor_id=doctor.id, patient_id=patient.id).first()
+        if not appointment:
+            appointment = Appointment(
+                doctor_id=doctor.id,
+                patient_id=patient.id,
+                appointment_date=datetime.utcnow(),
+                status="scheduled",
+                reason=f"Auto-created for {call_type} call request",
+                notes="Created via call request acceptance"
+            )
+            db.session.add(appointment)
+            db.session.commit()
+
         # Create consultation
         consultation = Consultation(
             doctor_id=doctor.id,
             patient_id=patient.id,
+            appointment_id=appointment.id,
             consultation_type=call_type,
             status='active',
             start_time=datetime.utcnow()
@@ -271,6 +287,19 @@ def respond_to_call_request(notification_id):
 
         db.session.commit()
 
+        # Notify patient of doctor's response
+        from models import User
+        patient_user = User.query.filter_by(id=patient.user_id).first()
+        response_title = f"Your {call_type} call request was {response_type}"
+        response_message = f"Dr. {doctor.name} has {response_type} your {call_type} call request."
+        create_notification(
+            user_id=patient_user.id,
+            title=response_title,
+            message=response_message,
+            notification_type="call_response",
+            related_id=doctor.user_id
+        )
+
         return jsonify({
             "message": f"Call request {response_type}",
             "notification_id": notification_id,
@@ -279,7 +308,26 @@ def respond_to_call_request(notification_id):
             "session": session_data
         })
     else:
-        # Just mark as read for rejected calls
+        # Notify patient of doctor's response
+        from models import User
+        patient = Patient.query.filter_by(user_id=notification.related_id).first()
+        doctor = Doctor.query.filter_by(user_id=current_user.id).first()
+        if patient and doctor:
+            patient_user = User.query.filter_by(id=patient.user_id).first()
+            call_type = 'video'
+            if 'audio' in notification.message.lower():
+                call_type = 'audio'
+            elif 'text' in notification.message.lower():
+                call_type = 'text'
+            response_title = f"Your {call_type} call request was {response_type}"
+            response_message = f"Dr. {doctor.name} has {response_type} your {call_type} call request."
+            create_notification(
+                user_id=patient_user.id,
+                title=response_title,
+                message=response_message,
+                notification_type="call_response",
+                related_id=doctor.user_id
+            )
         db.session.commit()
         return jsonify({
             "message": f"Call request {response_type}",

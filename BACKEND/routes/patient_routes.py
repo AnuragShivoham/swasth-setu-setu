@@ -5,6 +5,71 @@ from datetime import datetime
 
 patient_bp = Blueprint("patient", __name__)
 
+@patient_bp.route("/patient", methods=["POST"])
+@jwt_required()
+def add_patient():
+    """Add a new patient (doctor only)"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    if current_user.role != "doctor":
+        return jsonify({"error": "Doctor access required"}), 403
+
+    data = request.get_json()
+    required_fields = ["name", "age", "query", "status", "lastVisit", "avatar"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Create user for patient
+    new_user = User(
+        username=f"patient_{data['name'].replace(' ', '').lower()}",
+        password="defaultpassword",  # Should be set by patient later
+        email=f"{data['name'].replace(' ', '').lower()}@example.com",
+        role="patient"
+    )
+    db.session.add(new_user)
+    db.session.flush()
+
+    # Create patient profile
+    new_patient = Patient(
+        user_id=new_user.id,
+        name=data["name"],
+        date_of_birth=None,
+        phone=None,
+        address=None,
+        medical_history=None,
+        symptoms=data["query"]
+    )
+    db.session.add(new_patient)
+    db.session.commit()
+
+    return jsonify({"message": "Patient added successfully", "patient_id": new_patient.id}), 201
+
+@patient_bp.route("/patient/<int:patient_id>", methods=["DELETE"])
+@jwt_required()
+def delete_patient(patient_id):
+    """Delete a patient (doctor only)"""
+    current_user = User.query.filter_by(username=get_jwt_identity()).first()
+    if current_user.role != "doctor":
+        return jsonify({"error": "Doctor access required"}), 403
+
+    patient = Patient.query.get(patient_id)
+    if not patient:
+        return jsonify({"error": "Patient not found"}), 404
+
+    # Also delete user
+    user = User.query.get(patient.user_id)
+    if user:
+        db.session.delete(user)
+    db.session.delete(patient)
+    db.session.commit()
+    return jsonify({"message": "Patient deleted"})
+
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from models import db, User, Patient, Diagnosis
+from datetime import datetime
+
+patient_bp = Blueprint("patient", __name__)
+
 @patient_bp.route("/profile", methods=["GET"])
 @jwt_required()
 def get_patient_profile():
