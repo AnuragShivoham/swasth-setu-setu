@@ -8,6 +8,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    plugins: [react()],
+    base: '/swasth-setu-setu/',
   },
   plugins: [
     react(),
