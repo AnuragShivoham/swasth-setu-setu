@@ -1,9 +1,9 @@
 {
   "name": "vite_react_shadcn_ts",
+  "homepage": "https://AnuragShivoham.github.io/swasth-setu-setu",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://AnuragShivoham.github.io/swasth-setu-setu",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
