@@ -67,54 +67,12 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-
-@layer utilities {
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  .animate-float-slow {
-    animation: float 6s ease-in-out infinite;
-  }
-  .animate-float-medium {
-    animation: float 4s ease-in-out infinite;
-  }
-  .animate-float-human {
-    animation: float-human 5s ease-in-out infinite;
-  }
-  .animate-float-pet {
-    animation: float-pet 5s ease-in-out infinite;
-  }
-  .delay-1000 { animation-delay: 1s; }
-  .delay-2000 { animation-delay: 2s; }
-  .delay-3000 { animation-delay: 3s; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-@keyframes float-human {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  25% { transform: translateY(-8px) translateX(-2px); }
-  50% { transform: translateY(-12px) translateX(0px); }
-  75% { transform: translateY(-8px) translateX(2px); }
-}
-@keyframes float-pet {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  25% { transform: translateY(-8px) translateX(2px); }
-  50% { transform: translateY(-12px) translateX(0px); }
-  75% { transform: translateY(-8px) translateX(-2px); }
-}
+    /* Sidebar variables */
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -171,9 +129,7 @@ All colors MUST be HSL.
     --sidebar-border: 215 28% 22%;
     --sidebar-ring: 217 91% 65%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -184,7 +140,7 @@ All colors MUST be HSL.
 
   /* Healthcare Components */
   .consultation-card {
-    @apply bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)] 
+    @apply bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]
            hover:shadow-[var(--shadow-consultation)] transition-[var(--transition-smooth)];
   }
 
@@ -195,7 +151,7 @@ All colors MUST be HSL.
   }
 
   .feature-highlight {
-    @apply bg-gradient-to-br from-primary/5 to-secondary/5 
+    @apply bg-gradient-to-br from-primary/5 to-secondary/5
            border border-primary/10 rounded-lg px-3 py-1;
   }
 
@@ -235,11 +191,49 @@ All colors MUST be HSL.
 
   /* Healthcare Typography */
   .medical-heading {
-    @apply text-3xl font-bold bg-gradient-to-r from-primary to-secondary 
+    @apply text-3xl font-bold bg-gradient-to-r from-primary to-secondary
            bg-clip-text text-transparent;
   }
 
   .trust-text {
     @apply text-muted-foreground leading-relaxed;
   }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  .animate-float-slow {
+    animation: float 6s ease-in-out infinite;
+  }
+  .animate-float-medium {
+    animation: float 4s ease-in-out infinite;
+  }
+  .animate-float-human {
+    animation: float-human 5s ease-in-out infinite;
+  }
+  .animate-float-pet {
+    animation: float-pet 5s ease-in-out infinite;
+  }
+  .delay-1000 { animation-delay: 1s; }
+  .delay-2000 { animation-delay: 2s; }
+  .delay-3000 { animation-delay: 3s; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes float-human {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-8px) translateX(-2px); }
+  50% { transform: translateY(-12px) translateX(0px); }
+  75% { transform: translateY(-8px) translateX(2px); }
+}
+@keyframes float-pet {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-8px) translateX(2px); }
+  50% { transform: translateY(-12px) translateX(0px); }
+  75% { transform: translateY(-8px) translateX(-2px); }
 }
