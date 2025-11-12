@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
 import DoctorCard from "@/components/DoctorCard";
+import VideoCall from "@/components/VideoCall";
 import { useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, 
@@ -19,7 +20,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Human = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Human = () => {
   const [scheduleTime, setScheduleTime] = useState("");
   const [showSpecialists, setShowSpecialists] = useState(false);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [activeCall, setActiveCall] = useState<{ type: "video" | "audio"; doctor: any } | null>(null);
 
 
   const specialties = [
@@ -73,6 +75,35 @@ const Human = () => {
       isOnline: true
     }
   ];
+
+  const startVideoCall = (doctor?: typeof availableDoctors[0]) => {
+    setActiveCall({
+      type: "video",
+      doctor: doctor || availableDoctors[0]
+    });
+  };
+
+  const startAudioCall = (doctor?: typeof availableDoctors[0]) => {
+    setActiveCall({
+      type: "audio",
+      doctor: doctor || availableDoctors[0]
+    });
+  };
+
+  const endCall = () => {
+    setActiveCall(null);
+  };
+
+  if (activeCall) {
+    return (
+      <VideoCall
+        doctorName={activeCall.doctor.name}
+        specialty={activeCall.doctor.specialty}
+        callType={activeCall.type}
+        onEndCall={endCall}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,7 +149,7 @@ const Human = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" onClick={() => navigate('/?tab=chatbot&context=human')}>
+            <Button variant="hero" size="lg" onClick={() => startVideoCall()}>
               <Video className="h-5 w-5 mr-2" />
               Start Video Consultation
             </Button>
@@ -142,7 +173,7 @@ const Human = () => {
               eta="2 min"
               queuePosition={3}
               totalQueue={12}
-              onConsult={() => console.log("Starting video consultation")}
+              onConsult={() => startVideoCall()}
             />
             <ConsultCard
               type="audio"
@@ -150,9 +181,9 @@ const Human = () => {
               description="Voice-only consultation optimized for low bandwidth areas"
               doctorName="Priya Sharma"
               specialty="General Medicine"
-              onConsult={() => console.log("Starting audio consultation")}
-              onCancel={() => console.log("Cancelling consultation")}
-              onReschedule={() => console.log("Rescheduling consultation")}
+              onConsult={() => startAudioCall()}
+              onCancel={() => toast({ title: "Consultation cancelled" })}
+              onReschedule={() => setShowSchedule(true)}
             />
             <ConsultCard
               type="async"
@@ -203,7 +234,27 @@ const Human = () => {
           
           <div className="grid lg:grid-cols-3 gap-6 mb-8">
             {availableDoctors.map((doctor, index) => (
-              <DoctorCard key={index} {...doctor} />
+              <div key={index} className="relative">
+                <DoctorCard {...doctor} />
+                <div className="mt-3 flex gap-2">
+                  <Button 
+                    variant="default" 
+                    className="flex-1"
+                    onClick={() => startVideoCall(doctor)}
+                  >
+                    <Video className="h-4 w-4 mr-2" />
+                    Video Call
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => startAudioCall(doctor)}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Audio Call
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
           
@@ -273,11 +324,20 @@ const Human = () => {
             For life-threatening situations, call emergency services immediately
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" onClick={() => (window.location.href = 'tel:108')}>
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              onClick={() => window.open('tel:108', '_self')}
+            >
               <Phone className="h-5 w-5 mr-2" />
               Call 108 (Emergency)
             </Button>
-            <Button variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-destructive" onClick={() => (window.location.href = 'tel:102')}>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-white border-white hover:bg-white hover:text-destructive" 
+              onClick={() => window.open('tel:102', '_self')}
+            >
               <Phone className="h-5 w-5 mr-2" />
               Call 102 (Medical)
             </Button>
@@ -335,7 +395,16 @@ const Human = () => {
                       <div className="font-medium">Dr. {doc.name}</div>
                       <div className="text-sm text-muted-foreground">{doc.specialty} • {doc.availability}</div>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/?tab=chatbot&context=human')}>Start Chat</Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="default" onClick={() => { setShowSpecialists(false); startVideoCall(doc); }}>
+                        <Video className="h-4 w-4 mr-1" />
+                        Video
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setShowSpecialists(false); startAudioCall(doc); }}>
+                        <Phone className="h-4 w-4 mr-1" />
+                        Audio
+                      </Button>
+                    </div>
                   </div>
                 ))}
             </div>
