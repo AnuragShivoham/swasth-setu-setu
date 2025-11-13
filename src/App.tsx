@@ -9,6 +9,8 @@ import Human from "./pages/Human";
 import Pet from "./pages/Pet";
 import Auth from "./pages/Auth";
 import Doctor from "./pages/Doctor";
+import DoctorLogin from "./pages/DoctorLogin";
+import PatientLogin from "./pages/PatientLogin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/pet" element={<Pet />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/doctor" element={<Doctor />} />
+          <Route path="/doctor-login" element={<DoctorLogin />} />
+          <Route path="/patient-login" element={<PatientLogin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
