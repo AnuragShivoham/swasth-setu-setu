@@ -27,9 +27,13 @@ const Home = () => {
               <h1 className="text-2xl font-bold">SwasthSetu</h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="default" onClick={() => navigate('/auth')}>
+              <Button variant="default" onClick={() => navigate('/patient-login')}>
                 <User className="h-4 w-4 mr-2" />
-                Sign In / Sign Up
+                Patient Login
+              </Button>
+              <Button variant="secondary" onClick={() => navigate('/doctor-login')}>
+                <Stethoscope className="h-4 w-4 mr-2" />
+                Doctor Login
               </Button>
               <Button variant="outline" onClick={() => setActiveTab("settings")}>
                 <Settings className="h-4 w-4 mr-2" />
