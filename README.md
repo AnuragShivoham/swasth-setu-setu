@@ -1,4 +1,4 @@
-# SwasthSetu - Modern Healthcare Platform
+# PAWMANITY - Modern Healthcare Platform
 
 ## 🚨 IMPORTANT: You CANNOT open index.html directly!
 

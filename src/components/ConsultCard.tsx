@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Video, Phone, MessageSquare, Clock, Users } from "lucide-react";
+import ConsultationBookingDialog from "./ConsultationBookingDialog";
+import DoctorSelectionDialog from "./DoctorSelectionDialog";
 
 interface ConsultCardProps {
   type: "video" | "audio" | "async";
@@ -11,7 +14,8 @@ interface ConsultCardProps {
   totalQueue?: number;
   doctorName?: string;
   specialty?: string;
-  onConsult: () => void;
+  context: "human" | "pet";
+  onConsult?: () => void;
   onCancel?: () => void;
   onReschedule?: () => void;
 }
@@ -25,10 +29,14 @@ const ConsultCard = ({
   totalQueue,
   doctorName,
   specialty,
+  context,
   onConsult,
   onCancel,
   onReschedule,
 }: ConsultCardProps) => {
+  const [showBookingDialog, setShowBookingDialog] = useState(false);
+  const [showDoctorDialog, setShowDoctorDialog] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const getIcon = () => {
     switch (type) {
       case "video":
@@ -93,9 +101,28 @@ const ConsultCard = ({
         )}
 
         <div className="flex gap-2 pt-2">
-          <Button variant={getVariant()} className="flex-1" onClick={onConsult}>
-            Start Consultation
+          <Button
+            variant={getVariant()}
+            className="flex-1"
+            onClick={() => {
+              if (onConsult) {
+                onConsult();
+              } else {
+                setShowBookingDialog(true);
+              }
+            }}
+          >
+            {doctorName ? "Book with Doctor" : "Start Consultation"}
           </Button>
+          {!doctorName && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDoctorDialog(true)}
+            >
+              Choose Doctor
+            </Button>
+          )}
           {onCancel && (
             <Button variant="outline" size="sm" onClick={onCancel}>
               Cancel
@@ -108,6 +135,26 @@ const ConsultCard = ({
           )}
         </div>
       </CardContent>
+
+      <ConsultationBookingDialog
+        open={showBookingDialog}
+        onOpenChange={setShowBookingDialog}
+        consultationType={type}
+        specialty={specialty}
+        context={context}
+        doctorName={selectedDoctor?.name || doctorName}
+      />
+
+      <DoctorSelectionDialog
+        open={showDoctorDialog}
+        onOpenChange={setShowDoctorDialog}
+        specialty={specialty}
+        context={context}
+        onDoctorSelect={(doctor) => {
+          setSelectedDoctor(doctor);
+          setShowBookingDialog(true);
+        }}
+      />
     </Card>
   );
 };

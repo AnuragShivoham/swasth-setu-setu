@@ -98,8 +98,8 @@ const Index = () => {
                   </span>
                 </h1>
                 <p className="text-xl trust-text max-w-lg">
-                  SwasthSetu bridges patients, doctors, and public health systems with 
-                  flexible scheduling, multilingual support, and reliable connectivity 
+                  PAWMANITY bridges patients, doctors, and public health systems with
+                  flexible scheduling, multilingual support, and reliable connectivity
                   that works everywhere in India.
                 </p>
               </div>
@@ -159,7 +159,7 @@ const Index = () => {
               eta="2 min"
               queuePosition={3}
               totalQueue={12}
-              onConsult={() => console.log("Starting video consultation")}
+              context="human"
             />
             <ConsultCard
               type="audio"
@@ -167,7 +167,7 @@ const Index = () => {
               description="Voice-only consultation optimized for low bandwidth areas"
               doctorName="Priya Sharma"
               specialty="General Medicine"
-              onConsult={() => console.log("Starting audio consultation")}
+              context="human"
               onCancel={() => console.log("Cancelling consultation")}
               onReschedule={() => console.log("Rescheduling consultation")}
             />
@@ -176,7 +176,7 @@ const Index = () => {
               title="Message Doctor"
               description="Share your symptoms and get expert medical advice through secure messaging"
               eta="1 hour"
-              onConsult={() => console.log("Starting async consultation")}
+              context="human"
             />
           </div>
         </div>
@@ -187,7 +187,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              Why SwasthSetu is Different
+              Why PAWMANITY is Different
             </h2>
             <p className="text-xl trust-text max-w-3xl mx-auto">
               We've reimagined telemedicine to address real challenges faced by 
@@ -287,7 +287,7 @@ const Index = () => {
               Ready to Experience Better Healthcare?
             </h2>
             <p className="text-xl opacity-90">
-              Join millions of Indians who trust SwasthSetu for their healthcare needs. 
+              Join millions of Indians who trust PAWMANITY for their healthcare needs.
               Get started today and experience the future of telemedicine.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -308,7 +308,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
-              <h3 className="text-2xl font-bold">SwasthSetu</h3>
+              <h3 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">PAWMANITY</h3>
               <p className="text-background/70">
                 Bridging healthcare gaps across India with modern telemedicine 
                 that works for everyone.
@@ -348,7 +348,7 @@ const Index = () => {
           
           <div className="border-t border-background/20 mt-12 pt-8 text-center">
             <p className="text-background/70">
-              © 2024 SwasthSetu. Making healthcare accessible for every Indian.
+              © 2024 PAWMANITY. Making healthcare accessible for every Indian.
             </p>
           </div>
         </div>

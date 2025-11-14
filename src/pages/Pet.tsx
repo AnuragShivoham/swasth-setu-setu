@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ConsultCard from "@/components/ConsultCard";
+import VideoCall from "@/components/VideoCall";
+import AudioCall from "@/components/AudioCall";
+import ChatComponent from "@/components/ChatComponent";
+import CallRequestDialog from "@/components/CallRequestDialog";
+import PatientRequestDialog from "@/components/PatientRequestDialog";
 import { useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  Heart, 
-  Video, 
-  Phone, 
-  MessageSquare, 
+import {
+  ArrowLeft,
+  Heart,
+  Video,
+  Phone,
+  MessageSquare,
   Calendar,
   Shield,
   Clock,
@@ -16,12 +21,14 @@ import {
   Star,
   Dog,
   Cat,
-  Rabbit
+  Rabbit,
+  UserPlus
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Pet = () => {
   const navigate = useNavigate();
@@ -32,6 +39,14 @@ const Pet = () => {
   const [scheduleTime, setScheduleTime] = useState("");
   const [showSpecialists, setShowSpecialists] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [showAudioCall, setShowAudioCall] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [showCallRequest, setShowCallRequest] = useState(false);
+  const [showPatientRequest, setShowPatientRequest] = useState(false);
+  const [selectedVet, setSelectedVet] = useState<any>(null);
+  const [requestType, setRequestType] = useState<"video" | "audio" | "chat">("chat");
+  const [onlineVets, setOnlineVets] = useState<any[]>([]);
 
 
   const petServices = [
@@ -83,6 +98,80 @@ const Pet = () => {
     { name: "Others", count: "2% of consultations", icon: "🐰" }
   ];
 
+  useEffect(() => {
+    loadOnlineVets();
+  }, []);
+
+  const loadOnlineVets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("doctor_profiles")
+        .select(`
+          *,
+          profiles!inner(full_name, role)
+        `)
+        .eq("is_online", true)
+        .in("specialization", [
+          "General Veterinary",
+          "Pet Behavior",
+          "Pet Nutrition",
+          "Emergency Care",
+          "Vaccinations",
+          "Dental Care"
+        ]);
+
+      if (error) throw error;
+      setOnlineVets(data || []);
+    } catch (error) {
+      console.error("Error loading online vets:", error);
+    }
+  };
+
+  const handleCommunicationRequest = (vet: any, type: "video" | "audio" | "chat") => {
+    setSelectedVet(vet);
+    setRequestType(type);
+    setShowCallRequest(true);
+  };
+
+  const handlePatientRequest = (vet: any) => {
+    setSelectedVet(vet);
+    setShowPatientRequest(true);
+  };
+
+  const handleCallRequestSent = (reason: string) => {
+    // Store the request in localStorage for demo purposes
+    const requests = JSON.parse(localStorage.getItem("communication_requests") || "[]");
+    requests.push({
+      id: Date.now().toString(),
+      doctorId: selectedVet.id,
+      doctorName: selectedVet.profiles.full_name,
+      type: requestType,
+      reason,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      patientName: "Current User" // In real app, get from auth
+    });
+    localStorage.setItem("communication_requests", JSON.stringify(requests));
+
+    // In a real app, this would trigger a notification to the vet
+    console.log(`Communication request sent to Dr. ${selectedVet.profiles.full_name} for ${requestType} call`);
+  };
+
+  const handlePatientRequestSent = (requestData: any) => {
+    // Store the patient request in localStorage for demo purposes
+    const requests = JSON.parse(localStorage.getItem("patient_requests") || "[]");
+    requests.push({
+      id: Date.now().toString(),
+      ...requestData,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    });
+    localStorage.setItem("patient_requests", JSON.stringify(requests));
+
+    // In a real app, this would trigger a notification to the vet
+    console.log(`Patient request sent to Dr. ${selectedVet.profiles.full_name}`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -129,16 +218,86 @@ const Pet = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
+            <Button variant="consult" size="lg" onClick={() => navigate('/home?tab=chatbot&context=pet')}>
               <Video className="h-5 w-5 mr-2" />
               Start Vet Consultation
             </Button>
-            <Button variant="medical" size="lg" onClick={() => setShowSchedule(true)}>
-              <Calendar className="h-5 w-5 mr-2" />
-              Schedule Pet Checkup
+            <Button variant="medical" size="lg" onClick={() => navigate('/home?tab=chatbot&context=pet')}>
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Quick Vet Chat
             </Button>
           </div>
         </div>
+
+        {/* Online Veterinarians Section */}
+        {onlineVets.length > 0 && (
+          <section className="py-8 bg-success/5 border border-success/20 rounded-2xl">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold mb-2">🟢 Veterinarians Online Now</h3>
+              <p className="text-muted-foreground">Connect instantly with available veterinarians</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {onlineVets.slice(0, 6).map((vet, index) => (
+                <Card key={index} className="consultation-card">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-semibold">
+                            {vet.profiles.full_name.split(' ').map((n: string) => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background"></div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Dr. {vet.profiles.full_name}</h4>
+                        <p className="text-sm text-muted-foreground">{vet.specialization}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCommunicationRequest(vet, "video")}
+                        className="flex-1"
+                      >
+                        <Video className="h-4 w-4 mr-1" />
+                        Video
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCommunicationRequest(vet, "audio")}
+                        className="flex-1"
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        Audio
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCommunicationRequest(vet, "chat")}
+                        className="flex-1"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        Chat
+                      </Button>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handlePatientRequest(vet)}
+                      className="w-full mt-2"
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      Request as Patient
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Pet Types Served */}
         <section className="wellness-gradient rounded-2xl p-8">
@@ -146,7 +305,7 @@ const Pet = () => {
             <h3 className="text-2xl font-bold mb-4">We Care for All Pets</h3>
             <p className="trust-text">Professional veterinary care for every type of pet</p>
           </div>
-          
+
           <div className="grid md:grid-cols-4 gap-4">
             {petTypes.map((pet, index) => (
               <Card key={index} className="consultation-card text-center">
@@ -173,7 +332,7 @@ const Pet = () => {
               eta="5 min"
               queuePosition={2}
               totalQueue={8}
-              onConsult={() => console.log("Starting pet video consultation")}
+              context="pet"
             />
             <ConsultCard
               type="audio"
@@ -181,7 +340,7 @@ const Pet = () => {
               description="Discuss pet symptoms and behavior with veterinary experts"
               doctorName="Anita Verma"
               specialty="General Veterinary"
-              onConsult={() => console.log("Starting pet audio consultation")}
+              context="pet"
               onCancel={() => console.log("Cancelling pet consultation")}
               onReschedule={() => console.log("Rescheduling pet consultation")}
             />
@@ -190,7 +349,8 @@ const Pet = () => {
               title="Pet Care Messages"
               description="Send photos and details about your pet's condition for expert advice"
               eta="30 min"
-              onConsult={() => navigate('/?tab=chatbot&context=pet')}
+              context="pet"
+              onConsult={() => navigate('/home?tab=chatbot&context=pet')}
             />
           </div>
         </section>
@@ -316,7 +476,7 @@ const Pet = () => {
         {/* Pet Care Features */}
         <section>
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Why Choose SwasthSetu for Pet Healthcare?</h3>
+            <h3 className="text-2xl font-bold mb-4">Why Choose <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">PAWMANITY</span> for Pet Healthcare?</h3>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -375,7 +535,7 @@ const Pet = () => {
               <Phone className="h-5 w-5 mr-2" />
               Emergency Vet Call
             </Button>
-            <Button variant="consult" size="lg" onClick={() => navigate('/?tab=chatbot&context=pet')}>
+            <Button variant="consult" size="lg" onClick={() => navigate('/home?tab=chatbot&context=pet')}>
               <MessageSquare className="h-5 w-5 mr-2" />
               Quick Vet Chat
             </Button>
@@ -417,23 +577,113 @@ const Pet = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Call Request Dialog */}
+        <CallRequestDialog
+          isOpen={showCallRequest}
+          onClose={() => setShowCallRequest(false)}
+          doctorName={selectedVet?.profiles?.full_name || ""}
+          doctorSpecialty={selectedVet?.specialization || ""}
+          requestType={requestType}
+          onRequestSent={handleCallRequestSent}
+        />
+
+        {/* Patient Request Dialog */}
+        <PatientRequestDialog
+          isOpen={showPatientRequest}
+          onClose={() => setShowPatientRequest(false)}
+          doctorName={selectedVet?.profiles?.full_name || ""}
+          doctorSpecialty={selectedVet?.specialization || ""}
+          onRequestSent={handlePatientRequestSent}
+        />
+
+        {/* Video Call Dialog */}
+        <VideoCall
+          isOpen={showVideoCall}
+          onClose={() => setShowVideoCall(false)}
+          doctorName={selectedVet?.profiles?.full_name || selectedVet?.name || "Veterinarian"}
+          patientName="You"
+        />
+
+        {/* Audio Call Dialog */}
+        <AudioCall
+          isOpen={showAudioCall}
+          onClose={() => setShowAudioCall(false)}
+          doctorName={selectedVet?.profiles?.full_name || "Veterinarian"}
+          patientName="You"
+        />
+
+        {/* Chat Dialog */}
+        <Dialog open={showChat} onOpenChange={setShowChat}>
+          <DialogContent className="max-w-2xl h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Chat with Dr. {selectedVet?.profiles?.full_name}</DialogTitle>
+              <DialogDescription>
+                Secure messaging with your veterinarian
+              </DialogDescription>
+            </DialogHeader>
+            {selectedVet && (
+              <ChatComponent
+                roomId={`vet-${selectedVet.id}-patient-${Date.now()}`}
+                currentUserId="patient-current"
+                currentUserName="You"
+                currentUserRole="patient"
+                otherUserName={selectedVet.profiles.full_name}
+                otherUserRole="doctor"
+                onClose={() => setShowChat(false)}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Specialists Dialog */}
         <Dialog open={showSpecialists} onOpenChange={setShowSpecialists}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{selectedService ? `${selectedService} Specialists` : 'All Veterinarians'}</DialogTitle>
-              <DialogDescription>Select a vet to start chat.</DialogDescription>
+              <DialogTitle>{selectedService ? `${selectedService} Specialists` : 'Select a Veterinarian'}</DialogTitle>
+              <DialogDescription>Choose a veterinarian for your consultation.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-3">
-              {availableVets
-                .filter(v => !selectedService || v.specialty === selectedService)
+              {(onlineVets.length > 0 ? onlineVets : availableVets)
+                .filter(v => !selectedService || v.specialization === selectedService || v.specialty === selectedService)
                 .map((vet, i) => (
                   <div key={i} className="flex items-center justify-between p-3 rounded-lg border">
                     <div>
-                      <div className="font-medium">Dr. {vet.name}</div>
-                      <div className="text-sm text-muted-foreground">{vet.specialty} • {vet.availability}</div>
+                      <div className="font-medium">Dr. {vet.profiles?.full_name || vet.name}</div>
+                      <div className="text-sm text-muted-foreground">{vet.specialization || vet.specialty} • {vet.availability || 'Available'}</div>
                     </div>
-                    <Button size="sm" onClick={() => navigate('/?tab=chatbot&context=pet')}>Start Chat</Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedVet(vet);
+                          setRequestType("video");
+                          setShowCallRequest(true);
+                        }}
+                      >
+                        <Video className="h-4 w-4 mr-1" />
+                        Video
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedVet(vet);
+                          setRequestType("audio");
+                          setShowCallRequest(true);
+                        }}
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        Audio
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => navigate('/home?tab=chatbot&context=pet')}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        Chat
+                      </Button>
+                    </div>
                   </div>
                 ))}
             </div>
