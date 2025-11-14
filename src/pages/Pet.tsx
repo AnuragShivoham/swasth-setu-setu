@@ -22,7 +22,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const Pet = () => {
   const navigate = useNavigate();
@@ -33,7 +33,8 @@ const Pet = () => {
   const [scheduleTime, setScheduleTime] = useState("");
   const [showSpecialists, setShowSpecialists] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [activeCall, setActiveCall] = useState<{ type: "video" | "audio"; vet: any } | null>(null);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [selectedVet, setSelectedVet] = useState<{ name: string; specialty: string } | null>(null);
 
 
   const petServices = [
@@ -85,35 +86,6 @@ const Pet = () => {
     { name: "Others", count: "2% of consultations", icon: "🐰" }
   ];
 
-  const startVideoCall = (vet?: typeof availableVets[0]) => {
-    setActiveCall({
-      type: "video",
-      vet: vet || availableVets[0]
-    });
-  };
-
-  const startAudioCall = (vet?: typeof availableVets[0]) => {
-    setActiveCall({
-      type: "audio",
-      vet: vet || availableVets[0]
-    });
-  };
-
-  const endCall = () => {
-    setActiveCall(null);
-  };
-
-  if (activeCall) {
-    return (
-      <VideoCall
-        doctorName={`Dr. ${activeCall.vet.name}`}
-        specialty={activeCall.vet.specialty}
-        callType={activeCall.type}
-        onEndCall={endCall}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -160,7 +132,10 @@ const Pet = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="consult" size="lg" onClick={() => startVideoCall()}>
+            <Button variant="consult" size="lg" onClick={() => {
+              setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+              setShowVideoCall(true);
+            }}>
               <Video className="h-5 w-5 mr-2" />
               Start Vet Consultation
             </Button>
@@ -204,7 +179,10 @@ const Pet = () => {
               eta="5 min"
               queuePosition={2}
               totalQueue={8}
-              onConsult={() => startVideoCall()}
+              onConsult={() => {
+                setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+                setShowVideoCall(true);
+              }}
             />
             <ConsultCard
               type="audio"
@@ -212,9 +190,12 @@ const Pet = () => {
               description="Discuss pet symptoms and behavior with veterinary experts"
               doctorName="Anita Verma"
               specialty="General Veterinary"
-              onConsult={() => startAudioCall()}
-              onCancel={() => toast({ title: "Pet consultation cancelled" })}
-              onReschedule={() => setShowSchedule(true)}
+              onConsult={() => {
+                setSelectedVet({ name: "Anita Verma", specialty: "General Veterinary" });
+                setShowVideoCall(true);
+              }}
+              onCancel={() => console.log("Cancelling pet consultation")}
+              onReschedule={() => console.log("Rescheduling pet consultation")}
             />
             <ConsultCard
               type="async"
@@ -276,83 +257,63 @@ const Pet = () => {
           
           <div className="grid lg:grid-cols-3 gap-6 mb-8">
             {availableVets.map((vet, index) => (
-              <div key={index} className="relative">
-                <Card className="doctor-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="relative">
-                        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-secondary/20 to-accent/20 flex items-center justify-center border-2 border-secondary/20">
-                          <span className="text-secondary font-semibold text-lg">
-                            {vet.name.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        {vet.isOnline && (
-                          <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-success rounded-full border-2 border-background pulse-glow" />
-                        )}
+              <Card key={index} className="doctor-card">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="relative">
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-secondary/20 to-accent/20 flex items-center justify-center border-2 border-secondary/20">
+                        <span className="text-secondary font-semibold text-lg">
+                          {vet.name.split(' ').map(n => n[0]).join('')}
+                        </span>
                       </div>
-                      
-                      <div className="flex-1 space-y-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            Dr. {vet.name}
-                            <div className="flex items-center gap-1 text-yellow-500">
-                              <Star className="h-4 w-4 fill-current" />
-                              {vet.rating}
-                            </div>
+                      {vet.isOnline && (
+                        <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-success rounded-full border-2 border-background pulse-glow" />
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          Dr. {vet.name}
+                          <div className="flex items-center gap-1 text-yellow-500">
+                            <Star className="h-4 w-4 fill-current" />
+                            {vet.rating}
+                          </div>
+                        </div>
+                        
+                        <div className="text-sm text-secondary font-medium">
+                          {vet.specialty}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-4 mt-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {vet.experience} experience
                           </div>
                           
-                          <div className="text-sm text-secondary font-medium">
-                            {vet.specialty}
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {vet.languages.join(', ')}
                           </div>
-                          
-                          <div className="flex flex-wrap gap-4 mt-2 text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {vet.experience} experience
-                            </div>
-                            
-                            <div className="flex items-center gap-1">
-                              <Users className="h-3 w-3" />
-                              {vet.languages.join(', ')}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between mt-3">
-                            <span className="text-sm font-medium text-foreground">
-                              {vet.availability}
-                            </span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              vet.isOnline 
-                                ? "bg-success/10 text-success border border-success/20" 
-                                : "bg-muted text-muted-foreground"
-                            }`}>
-                              {vet.isOnline ? "Online" : "Offline"}
-                            </span>
-                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-sm font-medium text-foreground">
+                            {vet.availability}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            vet.isOnline 
+                              ? "bg-success/10 text-success border border-success/20" 
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {vet.isOnline ? "Online" : "Offline"}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-                <div className="mt-3 flex gap-2">
-                  <Button 
-                    variant="default" 
-                    className="flex-1"
-                    onClick={() => startVideoCall(vet)}
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Video Call
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1"
-                    onClick={() => startAudioCall(vet)}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Audio Call
-                  </Button>
-                </div>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
           
@@ -433,10 +394,10 @@ const Pet = () => {
             <Button 
               variant="consult" 
               size="lg" 
-              onClick={() => startVideoCall()}
+              onClick={() => navigate('/?tab=chatbot&context=pet')}
             >
-              <Video className="h-5 w-5 mr-2" />
-              Quick Vet Video Call
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Quick Vet Chat
             </Button>
           </div>
         </section>
@@ -492,21 +453,28 @@ const Pet = () => {
                       <div className="font-medium">Dr. {vet.name}</div>
                       <div className="text-sm text-muted-foreground">{vet.specialty} • {vet.availability}</div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="default" onClick={() => { setShowSpecialists(false); startVideoCall(vet); }}>
-                        <Video className="h-4 w-4 mr-1" />
-                        Video
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => { setShowSpecialists(false); startAudioCall(vet); }}>
-                        <Phone className="h-4 w-4 mr-1" />
-                        Audio
-                      </Button>
-                    </div>
+                    <Button size="sm" onClick={() => {
+                      setSelectedVet({ name: vet.name, specialty: vet.specialty });
+                      setShowVideoCall(true);
+                    }}>Start Video Call</Button>
                   </div>
                 ))}
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Video Call Modal */}
+        {showVideoCall && selectedVet && (
+          <VideoCall
+            consultationType="pet"
+            doctorName={selectedVet.name}
+            specialty={selectedVet.specialty}
+            onEndCall={() => {
+              setShowVideoCall(false);
+              setSelectedVet(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );

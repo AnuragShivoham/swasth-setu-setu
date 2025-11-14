@@ -1,21 +1,8 @@
-# SwasthSetu - Modern Healthcare Platform
-
-## 🚨 IMPORTANT: You CANNOT open index.html directly!
-
-This is a **Vite React app** - it requires a development server to work. Opening `index.html` in your browser will show a blank page.
+# Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/a34ba788-839d-40cf-8083-368fde51bd24
-
-## ✅ Features Available
-- Start Consultation (navigates to chatbot)
-- Schedule Consultation (date/time picker with local storage)
-- View Specialists Lists (modal with doctor/vet listings)
-- Quick Vet Chat (prefilled chatbot)
-- Chatbot for Humans (interactive health assistant)
-- Photo Diagnosis (AI image analysis using Supabase Edge Functions)
-- Emergency Call buttons
 
 ## How can I edit this code?
 
@@ -48,8 +35,6 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**🔥 The app will be available at: http://localhost:5173**
 
 **Edit a file directly in GitHub**
 

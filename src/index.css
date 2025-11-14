@@ -208,9 +208,4 @@ All colors MUST be HSL.
   .trust-text {
     @apply text-muted-foreground leading-relaxed;
   }
-
-  /* Video Call Utilities */
-  .mirror {
-    transform: scaleX(-1);
-  }
 }
